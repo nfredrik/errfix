@@ -229,11 +229,16 @@ public
 			  
 			  row_trans_list.each_index do |cell_index|
 			    if row_trans_list[cell_index] != nil
-				    transition = TransitionHolder.new(this_rows_start_state.to_s, row_trans_list[cell_index].to_s, too_states[cell_index].to_s)
-				    puts_debug "Read in transitions: #{transition}"
-				    
-				    # Store that transition
-				    state_transition_list.push transition 
+			      # Remove leading, trailing and multiple spaces
+			      cell_contents=row_trans_list[cell_index].strip.squeeze(" ")
+			      puts_debug("Cell contents: #{cell_contents}")
+			      cell_contents.split(/ /).each do |an_action|
+			        transition = TransitionHolder.new(this_rows_start_state.to_s, an_action, too_states[cell_index].to_s)
+		          puts_debug "Read in transition (from 2d state table): #{transition}"
+				      # Store that transition
+				      state_transition_list.push transition
+		        end # end each
+
 			    end # if nil
 			  end # end each index
 			  
@@ -299,7 +304,7 @@ public
 		self.adjacency_matrix.each_key do |table_key|
 			transition_list=self.adjacency_matrix[table_key]
 			transition_list.each do |transition|
-				my_graph.add_edge(state_nodes[transition.start_state] , state_nodes[transition.end_state] , :label=> transition.action)
+				my_graph.add_edge(state_nodes[transition.start_state] , state_nodes[transition.end_state] , :label=> " #{transition.action}     ")
 			end # end add transitions
 		end # end add nodes
 	

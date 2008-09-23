@@ -30,18 +30,22 @@ require 'eg_test_driver'
 
 class StateModelCreator__tests < Test::Unit::TestCase
 
+  # 1 Dimensional State tables
 	TEST1_CSV="test1.csv"           # Simple 2 state 2 action table
 	TEST2_1LINE_CSV="test2.csv"     # Only has 1 line
 	TEST3_0LINE_CSV="test3.csv"     # Has no lines
 	TEST4_CSV="test4.csv"           # Line with fork, UNIX format txt
 	TEST5_CSV="test5.csv"           # Several states in a row, single file
+	TEST9_CSV="test9.csv"           # Line with loop backs, DOS format txt
   TEST10_CSV="test10.csv"         # Line with fork, DOS format txt
   
+  # 2 Dimensional State tables
   TEST1_2d_CSV="test1_2d.csv"           # Simple 2 state 2 action table
 	TEST2_2d_1LINE_CSV="test2_2d.csv"     # Only has 1 line
 	TEST3_2d_0LINE_CSV="test3_2d.csv"     # Has no lines
 	TEST4_2d_CSV="test4_2d.csv"           # Line with fork, UNIX format txt
 	TEST5_2d_CSV="test5_2d.csv"           # Several states in a row, single file
+	TEST9_2d_CSV="test9_2d.csv"           # Line with loop backs, DOS Format txt
   TEST10_2d_CSV="test10_2d.csv"         # Line with fork, DOS format txt
 	
   
@@ -50,22 +54,22 @@ class StateModelCreator__tests < Test::Unit::TestCase
     @path = @path + "/"
     
     # For 1-Dimensional State tables
-	  @valid_csv_files_1d=[@path + TEST1_CSV,@path + TEST4_CSV,@path + TEST10_CSV]
+	  @valid_csv_files_1d=[@path + TEST1_CSV,@path + TEST4_CSV,@path + TEST10_CSV,@path + TEST9_CSV]
 	  puts @valid_csv_files_1d
-	  @valid_csv_files_states_1d=[2,5,5]
-	  @valid_csv_files_transitions_1d=[2,4,4]
+	  @valid_csv_files_states_1d=[2,5,5,5]
+	  @valid_csv_files_transitions_1d=[2,4,4,8]
 	  
 	  # For 2-Dimensional State tables
-	  @valid_csv_files_2d=[@path + TEST1_2d_CSV,@path + TEST4_2d_CSV,@path + TEST10_2d_CSV]
+	  @valid_csv_files_2d=[@path + TEST1_2d_CSV,@path + TEST4_2d_CSV,@path + TEST10_2d_CSV,@path + TEST9_2d_CSV]
 	  puts @valid_csv_files_2d
-	  @valid_csv_files_states_2d=[2,5,5]
-	  @valid_csv_files_transitions_2d=[2,4,4]
+	  @valid_csv_files_states_2d=[2,5,5,5]
+	  @valid_csv_files_transitions_2d=[2,4,4,8]
 	  
 	  # For 1 and 2 Dimensional State tables
 	  @valid_csv_files=@valid_csv_files_1d + @valid_csv_files_2d
 	  puts @valid_csv_files
-	  @valid_csv_files_states=[2,5,5,2,5,5]
-	  @valid_csv_files_transitions=[2,4,4,2,4,4]
+	  @valid_csv_files_states=[2,5,5,5,2,5,5,5]
+	  @valid_csv_files_transitions=[2,4,4,8,2,4,4,8]
 	  
 	end # end setup method
 

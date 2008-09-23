@@ -1,7 +1,7 @@
 require 'rubygems'
 SPEC = Gem::Specification.new do |s|
 	s.name = "errfix"
-	s.version = "0.0.5"
+	s.version = "0.0.6"
 	s.author = "Peter Houghton"
 	s.email = ""
 	s.homepage = "http://code.google.com/p/errfix/"

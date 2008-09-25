@@ -192,9 +192,9 @@ class StateModelCreator__tests < Test::Unit::TestCase
 		  assert_equal(GraphViz::new("G").class, smc_graph.class ,"Check graph is instance of graphviz class")	
 		
 		  # Output PostScript version of the graph, see if it fails...
-		  file_name=csv_file.sub(/\./ , '_')
+		  file_name=csv_file.sub(/\.csv$/ , '_')
 		  smc_graph.output( :output => "ps" , :file => "#{file_name}.ps" )
-		  assert(File.exist?("#{file_name}.ps"),"Check the graph file was written out.")
+		  assert(File.exist?("#{file_name}.ps"),"Check the graph file: #{file_name}.ps was written out.")
 	  end # end valid csvs
 	end # end test method 
 

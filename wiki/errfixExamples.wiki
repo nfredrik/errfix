@@ -1,0 +1,39 @@
+== Introduction ==
+
+errfix creates a software model of your system, based on a CSV file. This model can then be 'walked' automatically by errfix. 
+ 
+== errfix HelloWorld ==
+
+This simple example creates a model and outputs a text description of a random walk. It doesn't run any tests.
+
+The CSV file contents should be:
+
+||Start/End||STRANGERS||FRIENDS||ENEMIES||
+||STRANGERS||say_nothing||say_helloworld||say_wrong_thing||
+||FRIENDS||say_nothing|| ||say_wrong_thing||
+||ENEMIES|| || || ||
+
+You can download the hello_world.csv file.
+
+The errfix HelloWorld code is:
+
+{{{
+# errfix HelloWorld example.
+# 
+require 'rubygems'
+require 'errfix'
+
+# Create model (setting debug to false)
+conversation = StateModelCreator.new false
+# Load in the CSV file with our helloworld model
+conversation.load_table 'hello_world.csv'
+
+# Output the model in graphical (PostScript) format
+conversation.create_dot_graph.output( :output => "ps" , :file => "hello_world.ps" )
+
+# Create a random walk across the model.
+# Remember its random, so each time you run it, it might give you a different path...
+puts conversation.random_walk("STRANGERS")
+}}}
+
+

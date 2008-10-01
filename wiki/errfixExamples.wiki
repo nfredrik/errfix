@@ -13,7 +13,8 @@ The CSV file contents should be:
 ||FRIENDS||say_nothing|| ||say_wrong_thing||
 ||ENEMIES|| || || ||
 
-You can download the [http://sites.google.com/site/exploretesting/Home/hello_world.csv?attredirects=0 hello_world.csv] file.
+You can download the [http://sites.google.com/site/exploretesting/Home/hello_world.csv?attredirects=0 hello_world.csv file here].
+
 
 The errfix HelloWorld code is:
 
@@ -35,3 +36,16 @@ conversation.create_dot_graph.output( :output => "ps" , :file => "hello_world.ps
 # Remember its random, so each time you run it, it might give you a different path...
 puts conversation.random_walk("STRANGERS")
 }}}
+
+
+You can download [http://sites.google.com/site/exploretesting/Home/errfix_helloworld.rb?attredirects=0 errfix_helloworld.rb here].
+
+
+Place the above 2 files in the same folder, open a DOS prompt in that folder and type:
+{{{
+ruby errfix_helloworld.rb
+}}}
+
+If all is well you should get a Postscript file placed in the same folder called hellow_world.ps
+The file contents should look like this:
+http://sites.google.com/site/exploretesting/Home/helloworld.png?attredirects=0

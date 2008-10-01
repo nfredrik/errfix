@@ -41,7 +41,7 @@ puts conversation.random_walk("STRANGERS")
 You can download [http://sites.google.com/site/exploretesting/Home/errfix_helloworld.rb?attredirects=0 errfix_helloworld.rb here].
 
 
-Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in that folder and type:
+Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
 {{{
 ruby errfix_helloworld.rb
 }}}

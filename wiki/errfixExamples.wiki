@@ -48,4 +48,4 @@ ruby errfix_helloworld.rb
 
 If all is well you should get a Postscript file placed in the same folder called hellow_world.ps
 The file contents should look like this:
-http://sites.google.com/site/exploretesting/Home/helloworld.png?attredirects=0
+http://sites.google.com/site/exploretesting/Home/helloworld.gif?attredirects=0

@@ -13,7 +13,7 @@ The CSV file contents should be:
 ||FRIENDS||say_nothing|| ||say_wrong_thing||
 ||ENEMIES|| || || ||
 
-You can download the hello_world.csv file.
+You can download the [http://sites.google.com/site/exploretesting/Home/hello_world.csv?attredirects=0 hello_world.csv] file.
 
 The errfix HelloWorld code is:
 
@@ -35,5 +35,3 @@ conversation.create_dot_graph.output( :output => "ps" , :file => "hello_world.ps
 # Remember its random, so each time you run it, it might give you a different path...
 puts conversation.random_walk("STRANGERS")
 }}}
-
-

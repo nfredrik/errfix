@@ -1,6 +1,6 @@
 == Introduction ==
 
-errfix creates a software model of your system, based on a CSV file. This model can then be 'walked' automatically by errfix. 
+*errfix* creates a software model of your system, based on a CSV file. This model can then be 'walked' automatically by errfix. 
  
 == errfix HelloWorld ==
 

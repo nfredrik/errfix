@@ -6,6 +6,8 @@
 
 This simple example creates a model and outputs a text description of a random walk. It doesn't run any tests.
 
+
+=== The data: ===
 The CSV file contents should be:
 
 ||Start/End||STRANGERS||FRIENDS||ENEMIES||
@@ -15,7 +17,7 @@ The CSV file contents should be:
 
 You can download the [http://sites.google.com/site/exploretesting/Home/hello_world.csv?attredirects=0 hello_world.csv file here].
 
-
+=== The code: ===
 The errfix HelloWorld code is:
 
 {{{
@@ -40,7 +42,7 @@ puts conversation.random_walk("STRANGERS")
 
 You can download [http://sites.google.com/site/exploretesting/Home/errfix_helloworld.rb?attredirects=0 errfix_helloworld.rb here].
 
-
+===How to run the code:===
 Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
 {{{
 ruby errfix_helloworld.rb

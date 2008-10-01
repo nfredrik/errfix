@@ -41,10 +41,16 @@ puts conversation.random_walk("STRANGERS")
 You can download [http://sites.google.com/site/exploretesting/Home/errfix_helloworld.rb?attredirects=0 errfix_helloworld.rb here].
 
 
-Place the above 2 files in the same folder, open a DOS prompt in that folder and type:
+Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in that folder and type:
 {{{
 ruby errfix_helloworld.rb
 }}}
+
+The output will look something like this:
+Random Walk:
+STRANGERS,say_helloworld => FRIENDS,say_wrong_thing => ENEMIES,ENEMIES
+
+If you run the script again, you'll probably get a slightly different output. Thats because the script is generating random walks, so each time it will likely make a different random choice of steps.
 
 If all is well you should get a Postscript file placed in the same folder called hellow_world.ps
 The file contents should look like this:

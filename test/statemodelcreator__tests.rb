@@ -113,6 +113,15 @@ class StateModelCreator__tests < Test::Unit::TestCase
 		end # Assert Raises
 	end # end method
 
+  # Check that load_table returns a copy of the state model creator
+  # This makes it easier and cleaner to use.
+  def test_load_table_return
+    
+	  smc = StateModelCreator.new
+    returned_obj = smc.load_table(@path + TEST1_CSV)
+
+    assert( returned_obj.instance_of?(StateModelCreator) , "Check loadtable returns StateModelCreator, returns: #{returned_obj.class}" )
+  end # end load_table test
 
 	def test_state_store_general
 		smc = StateModelCreator.new

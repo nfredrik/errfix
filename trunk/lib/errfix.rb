@@ -78,89 +78,6 @@ private
   end # end extract state list
 
 
-public 
-
-#
-# Creates a FSM style model of software based on the contents of a CSV file.
-#
-# debug_flag  - Optional, set to false to eliminate debug, true to show
-	def initialize(debug_flag=true)
-
-		# Output debug?
-		self.debug= debug_flag
-
-	end # end def
-
-#
-# Load the CSV file into memory
-#
-  def load_table(csv_state_table)
-    
-    # Detect dimensions of state table.
-     #detect_state_table_dim(csv_state_table)
-		# Read in the CSV data, and store in hash (adjacency matrix)
-		self.adjacency_matrix= create_adjacency_matrix(read_csv_file(csv_state_table))
-		
-  end # end method
-
-  # Detect whether the CSV file contains a 1 or 2 dimensional State Table
-  #
-  # Returns :one_d or :two_d 
-  #
-  def detect_state_table_dim(csv_state_table)
-    raise MISSING_CSV unless File.exist?(csv_state_table)
-    raise EMPTY_CSV unless File.size(csv_state_table)>0
-    
-    # What Type of State table do we think this is?
-    cell_probable=:unknown
-	  
-	  csv_file = File.open(csv_state_table, 'r')
-	  
-	  puts_debug "Detecting on file: #{csv_state_table}"
-
-    CSV::Reader.parse( csv_file.read.gsub(/\r/,"\n") ) do |row_array|
-      puts_debug "Detecting State table: row length? #{row_array.length}"
-      
-		  top_left_cell = row_array[0]
-
-		  if (top_left_cell.chomp.downcase=="Start/End".downcase)
-		      cell_probable=:two_d
-		      break
-	      elsif (top_left_cell.chomp.downcase=="Start State".downcase)
-		      cell_probable=:one_d
-	        break
-	      else
-	        raise "Error: Type: #{cell_probable}: Unable to Detect whether this is a 1 or 2 Dimensional State Table"
-	        break
-		  end # end if  
-    end # end CSV
-    
-    csv_file.close
-    
-    return cell_probable
-  
-  end # end method
-
-#
-# List on standard out each state and the actions associated with it
-#
-	def to_s
-		out_str ="States, and their Actions:"
-		self.adjacency_matrix.each_key do |a_state|
-			out_str << "\nState: #{a_state}\n"
-			out_str << "Actions:\n"
-			if self.adjacency_matrix[a_state].length == 0
-				out_str << "\t<No Actions>\n"
-			else
-				self.adjacency_matrix[a_state].each do |a_transition|
-					out_str << "\t#{a_transition.action}\n"
-				end # end each
-					 	
-			end # end else
-		end # end each key
-		return out_str
-	end # end method
-
 
 	# Read in the CSV file that contains state-action-state information
 	#
@@ -214,7 +131,6 @@ public
 		grab_first_row = true
     too_states=Array.new
     row_trans_list=Array.new
-    puts "CSV should be unix format:"
     
 		CSV::Reader.parse(File.open(state_table_path, 'r').read.gsub(/\r/,"\n") ) do |row_array|
 		  
@@ -280,6 +196,126 @@ public
 		return adj_matrix
 	end # end def 
 
+	def random_steps(the_walk, steps_limit)
+	  if (the_walk.length >= steps_limit)
+	    return the_walk
+	  else 
+	    
+	    # Get the 'current' state of the walk
+	    if (the_walk.length == 0)
+	      # If just started then its the start state
+	      current_state = the_walk.start_state
+      else
+        # Otherwise its the the end state of the last transition
+	      current_state = the_walk.last_added.end_state
+      end
+	    actions = get_actions_for_state(current_state)
+
+			if (actions.length==0)
+				the_walk.end_state=current_state
+				return the_walk
+			else
+
+			  # Choose an option at random
+				choice=rand(actions.length)
+				next_state = self.adjacency_matrix[current_state][choice].end_state
+				action = self.adjacency_matrix[current_state][choice].action
+				
+				the_walk.transitions.push TransitionHolder.new(current_state,action,next_state)
+				
+				# Make the next step
+				random_steps(the_walk,steps_limit)
+				
+		  end # end actions
+    end # else
+	    
+	end # end method steps
+
+public 
+
+#
+# Creates a FSM style model of software based on the contents of a CSV file.
+#
+# debug_flag  - Optional, set to false to eliminate debug, true to show
+	def initialize(debug_flag=false)
+
+		# Output debug?
+		self.debug= debug_flag
+
+	end # end def
+
+#
+# Load the CSV file into memory
+#
+  def load_table(csv_state_table)
+    
+    # Detect dimensions of state table.
+     #detect_state_table_dim(csv_state_table)
+		# Read in the CSV data, and store in hash (adjacency matrix)
+		self.adjacency_matrix= create_adjacency_matrix(read_csv_file(csv_state_table))
+		return self
+		
+  end # end method
+
+  # Detect whether the CSV file contains a 1 or 2 dimensional State Table
+  #
+  # Returns :one_d , :two_d or :unknown 
+  #
+  def detect_state_table_dim(csv_state_table)
+    raise MISSING_CSV unless File.exist?(csv_state_table)
+    raise EMPTY_CSV unless File.size(csv_state_table)>0
+    
+    # What Type of State table do we think this is?
+    cell_probable=:unknown
+	  
+	  csv_file = File.open(csv_state_table, 'r')
+	  
+	  puts_debug "Detecting on file: #{csv_state_table}"
+
+    CSV::Reader.parse( csv_file.read.gsub(/\r/,"\n") ) do |row_array|
+      puts_debug "Detecting State table: row length? #{row_array.length}"
+      
+		  top_left_cell = row_array[0]
+
+		  if (top_left_cell.chomp.downcase=="Start/End".downcase)
+		      cell_probable=:two_d
+		      break
+	      elsif (top_left_cell.chomp.downcase=="Start State".downcase)
+		      cell_probable=:one_d
+	        break
+	      else
+	        raise "Error: Type: #{cell_probable}: Unable to Detect whether this is a 1 or 2 Dimensional State Table"
+	        break
+		  end # end if  
+    end # end CSV
+    
+    csv_file.close
+    
+    return cell_probable
+  
+  end # end method
+
+#
+# List on standard out each state and the actions associated with it
+#
+	def to_s
+		out_str ="States, and their Actions:"
+		self.adjacency_matrix.each_key do |a_state|
+			out_str << "\nState: #{a_state}\n"
+			out_str << "Actions:\n"
+			if self.adjacency_matrix[a_state].length == 0
+				out_str << "\t<No Actions>\n"
+			else
+				self.adjacency_matrix[a_state].each do |a_transition|
+					out_str << "\t#{a_transition.action}\n"
+				end # end each
+					 	
+			end # end else
+		end # end each key
+		return out_str
+	end # end method
+
+
 
 #
 #  call-seq:
@@ -291,14 +327,16 @@ public
 	def create_dot_graph
 
 		# Create the base object, then add nodes later etc
-		my_graph = GraphViz::new( "G", :rankdir=>"TB" ,:fontsize=>"12" , :center=>"true", :landscape=>"true")
-		my_graph.node[:shape]=STATE_SHAPE
+		my_graph = GraphViz::new( "G", :rankdir=>"TB" ,:fontsize=>"10" , :center=>"true", :landscape=>"true")
+		
+		#my_graph.node[:shape]=STATE_SHAPE
 
 		# Create a hash of all the nodes, a graph node is a state in our model
 		state_nodes = Hash.new
 		self.states_store.each do |a_state|
-			state_nodes[a_state] = my_graph.add_node(a_state)
+			state_nodes[a_state] = my_graph.add_node(a_state)	
 		end # end add nodes
+    dot_code = 
 
 		# For each entry in the Adjacency matrix extract the relationships and add the graph edges.
 		self.adjacency_matrix.each_key do |table_key|
@@ -346,6 +384,12 @@ public
 		return (walk_states.length.to_f/self.states_store.length.to_f)*100
 	end # end calc
 
+  #  call-seq:
+  #     statemodel.calc_transition_coverage(a_walk) -> float
+  #
+  #  Returns a float  representing the percentage of transitions covered by a given walk
+  #     
+  #
   def calc_transition_coverage(a_walk)
     
     puts_debug "\nCalculating Transition Coverage"
@@ -415,43 +459,7 @@ public
 		end # end if
 		
 		return a_walk
-	end # end def
-	
-	def random_steps(the_walk, steps_limit)
-	  if (the_walk.length >= steps_limit)
-	    return the_walk
-	  else 
-	    
-	    # Get the 'current' state of the walk
-	    if (the_walk.length == 0)
-	      # If just started then its the start state
-	      current_state = the_walk.start_state
-      else
-        # Otherwise its the the end state of the last transition
-	      current_state = the_walk.last_added.end_state
-      end
-	    actions = get_actions_for_state(current_state)
-
-			if (actions.length==0)
-				the_walk.end_state=current_state
-				return the_walk
-			else
-
-			  # Choose an option at random
-				choice=rand(actions.length)
-				next_state = self.adjacency_matrix[current_state][choice].end_state
-				action = self.adjacency_matrix[current_state][choice].action
-				
-				the_walk.transitions.push TransitionHolder.new(current_state,action,next_state)
-				
-				# Make the next step
-				random_steps(the_walk,steps_limit)
-				
-		  end # end actions
-    end # else
-	    
-	end # end method steps
-	
+	end # end def	
 	
 end # class
 
@@ -475,6 +483,9 @@ class Walk
 		return @transitions_list
 	end # end transitions
 
+  alias :steps  :transitions
+
+  # Returns an array of unique transisitons in a walk.
   def transitions_uniq
     trans_hash = Hash.new
     self.transitions.each do |transition|
@@ -535,8 +546,7 @@ class Walk
   end # end last added
 
 	def to_s
-		out_str="Random Walk:\n"
-		out_str << "#{self.start_state},"
+		out_str = "#{self.start_state},"
 		self.transitions.each_index do |index|
 			out_str << "#{self.transitions[index].action} => #{self.transitions[index].end_state},"
 		end

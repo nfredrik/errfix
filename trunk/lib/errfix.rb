@@ -23,7 +23,7 @@
 
 require "rubygems"
 require 'csv'
-require "graphviz"
+require 'ftools'
 
 # =ErrFix - StateModelCreator
 #
@@ -326,23 +326,17 @@ public
 #
 	def create_dot_graph
 
-		# Create the base object, then add nodes later etc
-		my_graph = GraphViz::new( "G", :rankdir=>"TB" ,:fontsize=>"10" , :center=>"true", :landscape=>"true")
-		
-		#my_graph.node[:shape]=STATE_SHAPE
-
-		# Create a hash of all the nodes, a graph node is a state in our model
-		state_nodes = Hash.new
-		self.states_store.each do |a_state|
-			state_nodes[a_state] = my_graph.add_node(a_state)	
-		end # end add nodes
-    dot_code = 
+		# Create the base object, then add edges/nodes later etc
+		my_graph = Graph.new
+		my_graph.name= "State_Model"
+		my_graph.node_style= :ellipse
+		my_graph.type = :digraph
 
 		# For each entry in the Adjacency matrix extract the relationships and add the graph edges.
 		self.adjacency_matrix.each_key do |table_key|
 			transition_list=self.adjacency_matrix[table_key]
 			transition_list.each do |transition|
-				my_graph.add_edge(state_nodes[transition.start_state] , state_nodes[transition.end_state] , :label=> " #{transition.action}     ")
+				my_graph.add_edge(transition.start_state , transition.end_state , " #{transition.action}v")
 			end # end add transitions
 		end # end add nodes
 	
@@ -590,3 +584,52 @@ class TransitionHolder
 	attr_accessor(:start_state , :end_state , :action)
 end # end class
 
+
+
+
+#
+# Graph is used to construct Graphviz DOT language graphs.
+# Graph negates the need for Ruby-graphviz to be installed.
+#
+class Graph
+  
+  attr_accessor(:name , :type , :node_style)
+  def initialize
+    @nodes=Array.new
+    @edges=Array.new
+  end # end init
+  
+ # def add_node(node_name)
+  #  @nodes.push node_name
+  #end # add node
+  
+  # add edge accepts 3 arguments From_node, Too_node and label
+  def add_edge(*edge_details)
+    if (edge_details.length !=3)
+      raise "Error: Incorrect number of arguments in add_edge"
+    end # end if length
+    @edges.push edge_details
+  end # end add edge
+  
+  def to_s
+    if (self.name==nil || self.type==nil)
+      raise "Graph Name or Type not set. Name:#{self.name} , Type:#{self.type}"
+    end # end if not setup 
+    
+    txt = "#{self.type} #{self.name} {\n"
+    txt << "  node [shape = #{self.node_style}];\n"
+    @edges.each do |edge|
+      txt << "  #{edge[0]} -> #{edge[1]} [ label = \"#{edge[2]}\" ];\n"
+    end # nodes
+    txt << "}\n"
+    
+    return txt
+  end # end to_s
+  
+  def output(filename)
+    outs = File.new(filename , "w")
+    outs.puts self.to_s
+    outs.close
+  end # end output
+  
+end # class

@@ -25,7 +25,6 @@
 require 'rubygems'
 require 'test/unit'
 require 'errfix'
-require 'graphviz'
 require 'eg_test_driver'
 
 class StateModelCreator__tests < Test::Unit::TestCase
@@ -198,12 +197,16 @@ class StateModelCreator__tests < Test::Unit::TestCase
 		  smc_graph = smc.create_dot_graph	
 
 		  # Check that the graph produced is at least of the correct class
-		  assert_equal(GraphViz::new("G").class, smc_graph.class ,"Check graph is instance of graphviz class")	
+		  assert_equal(Graph.new.class, smc_graph.class ,"Check graph is instance of graph class")	
 		
-		  # Output PostScript version of the graph, see if it fails...
-		  file_name=csv_file.sub(/\.csv$/ , '_')
-		  smc_graph.output( :output => "ps" , :file => "#{file_name}.ps" )
-		  assert(File.exist?("#{file_name}.ps"),"Check the graph file: #{file_name}.ps was written out.")
+		  # Output DOT version of the graph, see if it fails...
+		  file_name=csv_file.sub(/\.csv$/ , '_csv')
+		  smc_graph.output("#{file_name}.dot")
+		   
+		  assert(File.exist?("#{file_name}.dot"),"Check the graph file: #{file_name}.dot was written out.")
+		  
+		  
+		  
 	  end # end valid csvs
 	end # end test method 
 

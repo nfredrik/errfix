@@ -1,7 +1,7 @@
 require 'rubygems'
 SPEC = Gem::Specification.new do |s|
 	s.name = "errfix"
-	s.version = "0.0.7"
+	s.version = "0.0.8"
 	s.author = "Peter Houghton"
 	s.email = ""
 	s.homepage = "http://code.google.com/p/errfix/"
@@ -15,6 +15,5 @@ SPEC = Gem::Specification.new do |s|
 	s.autorequire = "errfix"
 	s.test_file = "test/test_runner.rb"
 	s.has_rdoc = true
-	s.add_dependency("ruby-graphviz" , ">= 0.8.0")	
 end
 	

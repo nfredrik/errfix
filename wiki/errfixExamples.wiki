@@ -32,7 +32,7 @@ conversation = StateModelCreator.new false
 conversation.load_table 'hello_world.csv'
 
 # Output the model in graphical (PostScript) format
-conversation.create_dot_graph.output( :output => "ps" , :file => "hello_world.ps" )
+conversation.create_dot_graph.output("hello_world.dot")
 
 # Create a random walk across the model.
 # Remember its random, so each time you run it, it might give you a different path...

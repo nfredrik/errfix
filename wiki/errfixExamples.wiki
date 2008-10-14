@@ -12,10 +12,10 @@ The CSV file contents should be:
 
 ||Start/End||WEB||IMAGES||MAPS||SHOPPING||MAIL||
 ||WEB||||click_images||click_maps||click_shopping||click_mail||
-||IMAGES||click_web||||click_maps||click_shopping||click_mail||
-||MAPS||click_web||click_images||||click_shopping||click_mail||
-||SHOPPING||click_web||click_images||click_maps||||click_mail||
-||MAIL||click_web||||||||
+||IMAGES||click_web|| ||click_maps||click_shopping||click_mail||
+||MAPS||click_web||click_images|| ||click_shopping||click_mail||
+||SHOPPING||click_web||click_images||click_maps|| ||click_mail||
+||MAIL||click_web|| || || ||
 
 You can download the [http://sites.google.com/site/exploretesting/Home/google_searches.csv file here].
 

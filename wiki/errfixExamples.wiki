@@ -2,7 +2,7 @@
 
 *errfix* creates a software model of your system, based on a CSV file. This model can then be 'walked' automatically by errfix. 
  
-== errfix HelloWorld ==
+== errfix Example: Google Search Homepages ==
 
 This simple example creates a model and outputs a text description of a random walk. It doesn't run any tests.
 
@@ -10,15 +10,17 @@ This simple example creates a model and outputs a text description of a random w
 === The data: ===
 The CSV file contents should be:
 
-||Start/End||STRANGERS||FRIENDS||ENEMIES||
-||STRANGERS||say_nothing||say_helloworld||say_wrong_thing||
-||FRIENDS||say_nothing|| ||say_wrong_thing||
-||ENEMIES|| || || ||
+||Start/End||WEB||IMAGES||MAPS||SHOPPING||MAIL||
+||WEB||||click_images||click_maps||click_shopping||click_mail||
+||IMAGES||click_web||||click_maps||click_shopping||click_mail||
+||MAPS||click_web||click_images||||click_shopping||click_mail||
+||SHOPPING||click_web||click_images||click_maps||||click_mail||
+||MAIL||click_web||||||||
 
-You can download the [http://sites.google.com/site/exploretesting/Home/hello_world.csv?attredirects=0 hello_world.csv file here].
+You can download the [http://sites.google.com/site/exploretesting/Home/google_searches.csv file here].
 
 === The code: ===
-The errfix HelloWorld code is:
+The example errfix Google Searches code is:
 
 {{{
 # errfix HelloWorld example.
@@ -26,37 +28,53 @@ The errfix HelloWorld code is:
 require 'rubygems'
 require 'errfix'
 
-# Create model (setting debug to false)
-conversation = StateModelCreator.new false
-# Load in the CSV file with our helloworld model
-conversation.load_table 'hello_world.csv'
+# Create model,Load in the CSV file with our Google Searches model
+google_searches = StateModelCreator.new.load_table 'google_searches.csv'
 
-# Output the model in graphical (PostScript) format
-conversation.create_dot_graph.output("hello_world.dot")
+# Write the model's graph to the filesystem (PostScript format)
+google_searches.create_dot_graph.output("google_searches.dot")
 
 # Create a random walk across the model.
 # Remember its random, so each time you run it, it might give you a different path...
-puts conversation.random_walk("STRANGERS")
+google_searches.random_walk("WEB").steps.each do |a_transition|
+  puts "Step:#{a_transition}"
+end # end the walk
 }}}
 
 
-You can download [http://sites.google.com/site/exploretesting/Home/errfix_helloworld.rb?attredirects=0 errfix_helloworld.rb here].
+You can download [http://sites.google.com/site/exploretesting/Home/errfix_helloworld.rb errfix_helloworld.rb here].
 
 ===How to run the code:===
 Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
 {{{
-ruby errfix_helloworld.rb
+ruby errfix_google_eg.rb
 }}}
 
 The output will look something like this:
 {{{
-Random Walk:
-STRANGERS,say_helloworld => FRIENDS,say_wrong_thing => ENEMIES,ENEMIES
+Step:WEB,click_images => IMAGES
+Step:IMAGES,click_web => WEB
+Step:WEB,click_shopping => SHOPPING
+Step:SHOPPING,click_web => WEB
+Step:WEB,click_maps => MAPS
+Step:MAPS,click_mail => MAIL
+Step:MAIL,click_web => WEB
+Step:WEB,click_mail => MAIL
+Step:MAIL,click_web => WEB
+Step:WEB,click_shopping => SHOPPING
+Step:SHOPPING,click_web => WEB
+Step:WEB,click_images => IMAGES
+Step:IMAGES,click_web => WEB
+Step:WEB,click_maps => MAPS
+Step:MAPS,click_images => IMAGES
+Step:IMAGES,click_maps => MAPS
+Step:MAPS,click_mail => MAIL
+Step:MAIL,click_web => WEB
+Step:WEB,click_images => IMAGES
+Step:IMAGES,click_maps => MAPS
 }}}
 
 If you run the script again, you'll probably get a slightly different output. Thats because the script is generating random walks, so each time it will likely make a different random choice of steps.
 
 
-If all is well you should get a PostScript file placed in the same folder called hellow_world.ps
-The file contents should look like this:
-http://sites.google.com/site/exploretesting/Home/helloworld.gif
+If all is well you should get a DOT file placed in the same folder called google_searches.dot

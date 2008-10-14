@@ -11,7 +11,7 @@ This simple example creates a model and outputs a text description of a random w
 The CSV file contents should be:
 
 ||Start/End||WEB||IMAGES||MAPS||SHOPPING||MAIL||
-||WEB||||click_images||click_maps||click_shopping||click_mail||
+||WEB|| ||click_images||click_maps||click_shopping||click_mail||
 ||IMAGES||click_web|| ||click_maps||click_shopping||click_mail||
 ||MAPS||click_web||click_images|| ||click_shopping||click_mail||
 ||SHOPPING||click_web||click_images||click_maps|| ||click_mail||

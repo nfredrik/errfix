@@ -17,7 +17,7 @@ The CSV file contents should be:
 ||SHOPPING||click_web||click_images||click_maps|| ||click_mail||
 ||MAIL||click_web|| || || || ||
 
-You can download the [http://sites.google.com/site/exploretesting/Home/google_searches.csv file here].
+You can download this CSV [http://sites.google.com/site/exploretesting/Home/google_searches.csv file here].
 
 ==== The code: ====
 The example errfix Google Searches code is:
@@ -97,10 +97,10 @@ puts "State Coverage: #{google_walk_1.state_coverage}"
 puts "Transition Coverage: #{google_walk_1.transition_coverage}"
 }}}
 
-Now lets create a simple System Under Test (SUT). This could be a class you are testing, but also a driver to the SUT. Typically this driver would direct your test tool, Selenium RC or WATiR
+Now lets create a simple System Under Test (SUT). This could be a class you are testing, but also a driver to the SUT. Typically this driver would direct your test tool, Selenium RC or WATiR.
 {{{
 class SystemUnderTestDriver
-  # Methods that errfix will look for...
+  # Action Methods that errfix will look for...
   def click_web;      puts "action: click_web"; end # end method
   def click_images;   puts "action: click_images"; end # end method
   def click_maps;     puts "action: click_maps"; end # end method
@@ -114,4 +114,31 @@ class SystemUnderTestDriver
   def test_MAIL;      puts "testing: MAIL"; end # end method  
 end # class under test
 }}}
- 
+
+The above driver code would be required normally, even when not using errfix. We've created it here to allow you to see how errfix might interact with your system.
+
+errfix can now easily drive through your model, along the path of the Random Walk. errfix will call methods with the same name as your actions (in the CSV file). It will also call a method called test_<STATE-NAME> after each action. These 'test_' methods can be used to execute tests, ensuring your SUT has correctly reached a new State.
+
+{{{
+google_walk_1.drive_using(SystemUnderTestDriver.new)
+}}}
+
+This will produce extra output that looks like this:
+{{{
+State Coverage: 100.0
+Transition Coverage: 64.7058823529412
+
+Lets get our Random Walk to drive our SUT or at least our SUT driver code...
+testing: WEB
+action: click_images
+testing: IMAGES
+action: click_mail
+testing: MAIL
+action: click_web
+testing: WEB
+action: click_maps
+testing: MAPS
+action: click_web
+testing: WEB
+...
+}}}

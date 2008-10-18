@@ -128,7 +128,7 @@ google_walk_1.drive_using(SystemUnderTestDriver.new)
 You can download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg_2.rb the code here].
 
 ====How to run the code:====
-Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
+Place the above file (and the CSV file mentioned above) in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
 {{{
 ruby errfix_google_eg_2.rb
 }}}
@@ -153,6 +153,4 @@ action: click_web
 testing: WEB
 ...
 }}}
-
-
 

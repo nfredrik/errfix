@@ -125,7 +125,16 @@ errfix can now easily drive through your model, along the path of the Random Wal
 google_walk_1.drive_using(SystemUnderTestDriver.new)
 }}}
 
-This will produce extra output that looks like this:
+You can download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg_2.rb the code here].
+
+====How to run the code:====
+Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
+{{{
+ruby errfix_google_eg_2.rb
+}}}
+
+The output will look something like this:
+
 {{{
 State Coverage: 100.0
 Transition Coverage: 64.7058823529412
@@ -145,4 +154,5 @@ testing: WEB
 ...
 }}}
 
-Download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg_2.rb the code].
+
+

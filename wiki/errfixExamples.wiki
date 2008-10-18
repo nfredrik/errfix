@@ -74,7 +74,7 @@ Step:WEB,click_images => IMAGES
 Step:IMAGES,click_maps => MAPS
 }}}
 
-If you run the script again, you'll probably get a slightly different output. Thats because the script is generating random walks, so each time it will likely make a different random choice of steps.
+If you run the script again, you'll probably get a slightly different output. Thats because the script is generating _random_ walks, so each time it will likely make a different random choice of steps.
 
 If all is well you should get a DOT file placed in the same folder called google_searches.dot DOT files can be viewed using [http://www.graphviz.org/ GraphViz].
 The model when rendered in Graphviz should look similar to this:

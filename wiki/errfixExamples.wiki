@@ -117,7 +117,7 @@ end # class under test
 
 The above driver code would be required normally, even when not using errfix. We've created it here to allow you to see how errfix might interact with your system.
 
-errfix can now easily drive through your model, along the path of the Random Walk. errfix will call methods with the same name as your actions (in the CSV file). It will also call a method called test_<STATE-NAME> after each action. These 'test_' methods can be used to execute tests, ensuring your SUT has correctly reached a new State.
+errfix can now easily drive through your model, along the path of the Random Walk. errfix will call methods with the same name as your actions (in the CSV file). It will also call a method called test_STATE-NAME after each action. These 'test_' methods can be used to execute tests, ensuring your SUT has correctly reached a new State.
 
 {{{
 google_walk_1.drive_using(SystemUnderTestDriver.new)

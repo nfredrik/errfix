@@ -36,8 +36,11 @@ google_searches.create_dot_graph.output("google_searches.dot")
 
 # Create a random walk across the model.
 # Remember its random, so each time you run it, it might give you a different path...
-google_searches.random_walk("WEB").steps.each do |a_transition|
-  puts "Step:#{a_transition}"
+google_walk_1 = google_searches.random_walk("WEB")
+
+# Step Through the walk.
+google_walk_1.steps.each do |a_transition|
+  puts "Step: #{a_transition}"
 end # end the walk
 }}}
 
@@ -85,5 +88,30 @@ http://sites.google.com/site/exploretesting/Home/google_searches.png
 
 Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
 
+==== The code: ====
 
+First lets print out the coverage statistics for this walk:
+
+{{{
+puts "State Coverage: #{google_walk_1.state_coverage}"
+puts "Transition Coverage: #{google_walk_1.transition_coverage}"
+}}}
+
+Now lets create a simple System Under Test (SUT). This could be a class you are testing, but also a driver to the SUT. Typically this driver would direct your test tool, Selenium RC or WATiR
+{{{
+class SystemUnderTestDriver
+  # Methods that errfix will look for...
+  def click_web;      puts "action: click_web"; end # end method
+  def click_images;   puts "action: click_images"; end # end method
+  def click_maps;     puts "action: click_maps"; end # end method
+  def click_shopping; puts "action: click_shopping"; end # end method
+  def click_mail;     puts "action: click_mail"; end # end method
+  # Include these methods to verify state of the SUT
+  def test_WEB;       puts "testing: WEB"; end # end method
+  def test_IMAGES;    puts "testing: IMAGES"; end # end method
+  def test_MAPS;      puts "testing: MAPS"; end # end method
+  def test_SHOPPING;  puts "testing: SHOPPING"; end # end method
+  def test_MAIL;      puts "testing: MAIL"; end # end method  
+end # class under test
+}}}
  

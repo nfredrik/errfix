@@ -84,6 +84,8 @@ The model when rendered in Graphviz should look similar to this:
 http://sites.google.com/site/exploretesting/Home/google_searches.png
 
 
+
+
 == Google Search Homepages Examples: A Random Walk Driving a (Fake) System Under Test==
 
 Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
@@ -142,3 +144,5 @@ action: click_web
 testing: WEB
 ...
 }}}
+
+Download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg_2.rb the code].

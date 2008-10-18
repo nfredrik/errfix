@@ -2,9 +2,9 @@
 
 *errfix* creates a software model of your system, from a simple CSV file. errfix lets you create _Random Walks_ across your model, moving from State to State by executing actions.
  
-== errfix - Google Search Homepages Examples: A Simple Walk ==
+== errfix - Google Search Homepages Examples: A Simple _Random_ Walk ==
 
-This simple example creates a model and outputs a text description of a random walk. It doesn't run any tests.
+This example script creates a model and outputs a text description of a random walk. (It doesn't run any tests.)
 
 
 === The data: ===
@@ -19,7 +19,7 @@ The CSV file contents should be:
 
 You can download the [http://sites.google.com/site/exploretesting/Home/google_searches.csv file here].
 
-=== The code: ===
+==== The code: ====
 The example errfix Google Searches code is:
 
 {{{
@@ -44,7 +44,7 @@ end # end the walk
 
 You can download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg.rb errfix_google_eg.rb here].
 
-===How to run the code:===
+====How to run the code:====
 Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
 {{{
 ruby errfix_google_eg.rb
@@ -74,8 +74,16 @@ Step:WEB,click_images => IMAGES
 Step:IMAGES,click_maps => MAPS
 }}}
 
-If you run the script again, you'll probably get a slightly different output. Thats because the script is generating _random_ walks, so each time it will likely make a different random choice of steps.
+If you run the script again, you'll probably get a slightly different output. Thats because the script is generating _random_ walks, therefore each time it will likely make a different random choice of steps.
 
 If all is well you should get a DOT file placed in the same folder called google_searches.dot DOT files can be viewed using [http://www.graphviz.org/ GraphViz].
 The model when rendered in Graphviz should look similar to this:
 http://sites.google.com/site/exploretesting/Home/google_searches.png
+
+
+== errfix - Google Search Homepages Examples: A Random Walk Driving a (Fake) System Under Test==
+
+Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
+
+
+ 

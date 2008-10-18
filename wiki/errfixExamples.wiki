@@ -1,8 +1,8 @@
 == Introduction ==
 
-*errfix* creates a software model of your system, based on a CSV file. This model can then be 'walked' automatically by errfix. 
+*errfix* creates a software model of your system, from a simple CSV file. errfix lets you create _Random Walks_ across your model, moving from State to State by executing actions.
  
-== errfix Example: Google Search Homepages ==
+== errfix - Google Search Homepages Examples: A Simple Walk ==
 
 This simple example creates a model and outputs a text description of a random walk. It doesn't run any tests.
 
@@ -77,4 +77,4 @@ Step:IMAGES,click_maps => MAPS
 If you run the script again, you'll probably get a slightly different output. Thats because the script is generating random walks, so each time it will likely make a different random choice of steps.
 
 
-If all is well you should get a DOT file placed in the same folder called google_searches.dot
+If all is well you should get a DOT file placed in the same folder called google_searches.dot DOT files can be viewed using [http://www.graphviz.org/ GraphViz].

@@ -2,7 +2,9 @@
 
 *errfix* creates a software model of your system, from a simple CSV file. errfix lets you create _Random Walks_ across your model, moving from State to State by executing actions.
  
-== Google Search Homepages Examples: A Simple _Random_ Walk ==
+----
+
+== Example: A Simple _Random_ Walk ==
 
 This example script creates a model and outputs a text description of a random walk. (It doesn't run any tests.)
 
@@ -84,9 +86,9 @@ The model when rendered in Graphviz should look similar to this:
 http://sites.google.com/site/exploretesting/Home/google_searches.png
 
 
+----
 
-
-== Google Search Homepages Examples: A Random Walk Driving a (Fake) System Under Test==
+== Example: A Random Walk Driving a (Fake) System Under Test==
 
 Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
 
@@ -153,4 +155,3 @@ action: click_web
 testing: WEB
 ...
 }}}
-

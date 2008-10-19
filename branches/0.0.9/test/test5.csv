@@ -1,0 +1,8 @@
+Start State,Action,End State
+STATEA,action1,STATEB
+STATEB,action2,STATEC
+STATEC,action3,STATED
+STATED,action4,STATEE
+STATEE,action5,STATEF
+STATEF,action6,STATEG
+STATEG,action7,STATEH

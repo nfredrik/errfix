@@ -316,12 +316,11 @@ public
 	end # end method
 
 
-
 #
 #  call-seq:
-#     statemodel.create_dot_graph -> graph_viz_obj
+#     statemodel.create_dot_graph -> Graph
 #
-#  Returns a graph_viz graph object
+#  Returns a Graph object, containing DOT language representations of the state model.
 #     
 #
 	def create_dot_graph
@@ -336,13 +335,19 @@ public
 		self.adjacency_matrix.each_key do |table_key|
 			transition_list=self.adjacency_matrix[table_key]
 			transition_list.each do |transition|
-				my_graph.add_edge(transition.start_state , transition.end_state , " #{transition.action}v")
+				my_graph.add_edge(transition.start_state , transition.end_state , " #{transition.action} ")
 			end # end add transitions
 		end # end add nodes
 	
 		return my_graph
 	end # end create graph
 
+# 
+#  call-seq:
+#     statemodel.get_actions_for_state("A_STATE") -> Array
+#
+# Returns an array of Strings, representing each action available from the passed state.
+#
 	def get_actions_for_state(a_state)
 		actions_list=Array.new	
 		self.adjacency_matrix[a_state].each do |a_transition|
@@ -415,9 +420,16 @@ public
 		return transitions_in_model
   end # extract valid transitions
 
+#  call-seq:
+#     statemodel.random_walk("START_STATE") -> Walk
 #
-# Create a random walk over the model, starting at _start_state_
+# Create a random walk over the model, starting at START_STATE
 #
+# Returns a Walk object containing each transition off the random walk.
+# Walk objects can then be used to 'drive' your System Under Test or framework driver code.
+# 
+# By default the walk will have a length of MAX_STEPS unless a dead end is reached first.
+# This can be overridden by passing a second Integer argument.
 	def random_walk(start_state, steps_limit=MAX_STEPS)
 	
 	  # Check Start State exists in model etc
@@ -442,17 +454,18 @@ public
     # Call the random steps code to actually make the 'steps'
     complete_walk = random_steps(a_walk, steps_limit)
 
+
 		# Calculate state coverage for this walk	
 	  complete_walk.state_coverage=calc_state_coverage(a_walk)
 	  complete_walk.transition_coverage=calc_transition_coverage(a_walk)
 		
 		puts_debug "This walk has coverage metrics of:"
 		if self.debug
-			printf "\tState coverage: %3.1f%\n" , a_walk.state_coverage
-		  printf "\tTransition coverage: %3.1f%\n" , a_walk.transition_coverage
+			printf "\tState coverage: %3.1f%\n" , complete_walk.state_coverage			
+		  printf "\tTransition coverage: %3.1f%\n" , complete_walk.transition_coverage
 		end # end if
 		
-		return a_walk
+		return complete_walk
 	end # end def	
 	
 end # class

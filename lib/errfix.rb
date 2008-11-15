@@ -646,3 +646,49 @@ class Graph
   end # end output
   
 end # class
+
+class BlankStateMachine
+  
+  def initialize
+    @actions=Array.new
+    @states=Array.new
+  end # end init
+  
+  def actions
+    return @actions
+  end # end actions
+  
+  def attach_start_state(action_name)
+    attach_state(:start)
+  end # end attach
+  
+  def attach_states(action_name, start_state, end_state)
+    if !@actions.include?(action_name)
+      raise "Action not found"
+    end # end if  
+    transition = TransitionHolder.new(start_state,action_name,end_state)
+		puts_debug "Read in transitions: #{transition}"
+  end # end action
+  
+  def states
+    return @states
+  end # end states
+  
+  def define_action(action_name)
+
+    @actions.push action_name  
+    self.class.send(:define_method , action_name) do 
+      begin
+        puts "Action: #{action_name}"
+        yield
+      rescue LocalJumpError 
+        # ignore, this is just a plain action.
+      end # end rescue
+    end # end proc
+    
+  end # end add action
+  
+end # end class
+
+
+

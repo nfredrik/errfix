@@ -647,7 +647,7 @@ class Graph
   
 end # class
 
-class BlankStateMachine
+class StateMachine
   
   def initialize
     @actions=Array.new
@@ -667,7 +667,6 @@ class BlankStateMachine
       raise "Action not found"
     end # end if  
     transition = TransitionHolder.new(start_state,action_name,end_state)
-		puts_debug "Read in transitions: #{transition}"
   end # end action
   
   def states

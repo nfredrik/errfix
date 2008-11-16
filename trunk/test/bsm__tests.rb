@@ -34,7 +34,7 @@ class BSM__tests < Test::Unit::TestCase
 	end # end setup
 
   def test_action_simple_action_define
-    myfsm = BlankStateMachine.new
+    myfsm = StateMachine.new
     myfsm.define_action :action1 do
         puts "stuff"
       end # end add action
@@ -53,24 +53,32 @@ class BSM__tests < Test::Unit::TestCase
     
   end # end test
 
-  def test_state_simple_state_define
+  def test_state_simple_transition_define
     
-    myfsm = BlankStateMachine.new
+    myfsm = StateMachine.new
     myfsm.define_action :action1 do
         puts "stuff"
       end # end add action
     
+    # Create a transition
     myfsm.attach_states(:action1 , :STATEA , :STATEB)
-    assert(myfsm.states.include?(:STATEA) , "Check stateA added")
-    assert(myfsm.states.include?(:STATEB) , "Check stateB added")
+    # Check states were added
+    assert(myfsm.states_store.include?(:STATEA) , "Check STATEA added")
+    assert(myfsm.states_store.include?(:STATEB) , "Check STATEB added")
+  end # end test  
     
-    # Catch missing objects
+  def test_state_simple_transition_missing
+    
+    myfsm = StateMachine.new
+    
+    # If an action isn't there should throw an exception
+    # 
     assert_raises RuntimeError do
-      returned_obj = myfsm.action(:action3)
+      returned_obj = myfsm.attach_states(:state1 , :action3 , :state2)
     end # end assert
     
-    
   end # end state test
+  
   
 	def teardown
 	end # end teardown/clearup

@@ -217,7 +217,7 @@ class StateModelCreator__tests < Test::Unit::TestCase
 		# Check standard length walk
 		the_walk = sm.random_walk("STATEA")
 		assert_equal(Walk.new.class ,               the_walk.class ,              "Check random walk returns Walk instance" )
-		assert_equal(StateModelCreator::MAX_STEPS , the_walk.transitions.length , "Check Walks to the maximum in a loop.")
+		assert_equal(StateMachine::MAX_STEPS , the_walk.transitions.length , "Check Walks to the maximum in a loop.")
 		
 		# Check limited length walk
 		the_walk = sm.random_walk("STATEA",5)

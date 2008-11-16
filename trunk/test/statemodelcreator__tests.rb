@@ -112,31 +112,31 @@ class StateModelCreator__tests < Test::Unit::TestCase
 		end # Assert Raises
 	end # end method
 
-  # Check that load_table returns a copy of the state model creator
+  # Check that load_table returns a copy of the state machine
   # This makes it easier and cleaner to use.
   def test_load_table_return
     
 	  smc = StateModelCreator.new
     returned_obj = smc.load_table(@path + TEST1_CSV)
 
-    assert( returned_obj.instance_of?(StateModelCreator) , "Check loadtable returns StateModelCreator, returns: #{returned_obj.class}" )
+    assert( returned_obj.instance_of?(StateMachine) , "Check loadtable returns StateMachine, returns: #{returned_obj.class}" )
   end # end load_table test
 
 	def test_state_store_general
 		smc = StateModelCreator.new
-	  smc.load_table(@path + TEST1_CSV)
+	  sm = smc.load_table(@path + TEST1_CSV)
 	  
 		# Check that the states store is an array of strings
-		assert_equal(Array.new.class,smc.states_store.class, "States Store is an Array")
-		assert_equal(String.new.class ,smc.states_store[0].class, "States Store Array contains Strings")
+		assert_equal(Array.new.class,sm.states_store.class, "States Store is an Array")
+		assert_equal(String.new.class ,sm.states_store[0].class, "States Store Array contains Strings")
 
 		# Check that the correct number of states were added 
-		assert(smc.states_store.length==2)
+		assert(sm.states_store.length==2)
 
 		# Check that the states store contains the 2 states in the csv	
-		assert((smc.states_store[0]=="STATEA")||(smc.states_store[0]=="STATEB") , "States store pos 0 is A or B")	
-		assert((smc.states_store[1]=="STATEA")||(smc.states_store[1]=="STATEB") , "States store pos 1 is A or B")
-		assert( (smc.states_store[0] != smc.states_store[1] ) , "States store, the states are not the same...")
+		assert((sm.states_store[0]=="STATEA")||(sm.states_store[0]=="STATEB") , "States store pos 0 is A or B")	
+		assert((sm.states_store[1]=="STATEA")||(sm.states_store[1]=="STATEB") , "States store pos 1 is A or B")
+		assert((sm.states_store[0] != sm.states_store[1] ) , "States store, the states are not the same...")
 
 	end # end test
 
@@ -146,10 +146,10 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	def test_to_s
     @valid_csv_files.each do |csv_file|
 		  smc = StateModelCreator.new
-      smc.load_table(csv_file)
+      sm = smc.load_table(csv_file)
       
-		  assert_equal(String.new.class , smc.to_s.class , "Check that the to_s produces a string ok")
-		  puts smc.to_s
+		  assert_equal(String.new.class , sm.to_s.class , "Check that the to_s produces a string ok")
+		  puts sm.to_s
 		end # end csv files
 	end # end test to_s
 
@@ -157,11 +157,11 @@ class StateModelCreator__tests < Test::Unit::TestCase
   # Check that the state returns correct actions
 	def test_get_actions_for_state
 		smc = StateModelCreator.new
-		smc.load_table(@path + TEST1_CSV)
+		sm = smc.load_table(@path + TEST1_CSV)
 		
 		# Check that correct actions are returned
-		assert_equal("action1",smc.get_actions_for_state("STATEA")[0],"Check first action is action1")
-		assert_equal("action2",smc.get_actions_for_state("STATEB")[0],"Check second action is action2")	
+		assert_equal("action1",sm.get_actions_for_state("STATEA")[0],"Check first action is action1")
+		assert_equal("action2",sm.get_actions_for_state("STATEB")[0],"Check second action is action2")	
 
 	end # test end
 
@@ -170,13 +170,13 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	    csv_file=@valid_csv_files[index]
 	    
 		  smc = StateModelCreator.new
-		  smc.load_table(csv_file)
+		  sm = smc.load_table(csv_file)
 
 		  # Check that Adjacency Matrix is ok, this is actually the adjacency matrix
-		  assert_equal(Hash.new.class,smc.adjacency_matrix.class, "Check state is the right class in #{csv_file}.")
-		  assert_equal(@valid_csv_files_states[index],smc.adjacency_matrix.keys.length, "Check correct number of states in #{csv_file}")
+		  assert_equal(Hash.new.class,sm.adjacency_matrix.class, "Check state is the right class in #{csv_file}.")
+		  assert_equal(@valid_csv_files_states[index],sm.adjacency_matrix.keys.length, "Check correct number of states in #{csv_file}")
 
-		  transition_obj=smc.adjacency_matrix.shift[1][0]
+		  transition_obj=sm.adjacency_matrix.shift[1][0]
 		  assert_equal(TransitionHolder.new.class , transition_obj.class, "Check hash is full of transitions in #{csv_file}")
 		  assert_equal(String.new.class , transition_obj.start_state.class , "Check start state is a string class in #{csv_file}")
     end # end each file
@@ -191,21 +191,19 @@ class StateModelCreator__tests < Test::Unit::TestCase
     @valid_csv_files.each do |csv_file|
       puts csv_file
       smc = StateModelCreator.new
-      smc.load_table(csv_file)
-
+      sm = smc.load_table(csv_file)
+      
 		  # Create the Graphiz graph object, see if it fails...
-		  smc_graph = smc.create_dot_graph	
+		  sm_graph = sm.create_dot_graph	
 
 		  # Check that the graph produced is at least of the correct class
-		  assert_equal(Graph.new.class, smc_graph.class ,"Check graph is instance of graph class")	
+		  assert_equal(Graph.new.class, sm_graph.class ,"Check graph is instance of graph class")	
 		
 		  # Output DOT version of the graph, see if it fails...
 		  file_name=csv_file.sub(/\.csv$/ , '_csv')
-		  smc_graph.output("#{file_name}.dot")
+		  sm_graph.output("#{file_name}.dot")
 		   
 		  assert(File.exist?("#{file_name}.dot"),"Check the graph file: #{file_name}.dot was written out.")
-		  
-		  
 		  
 	  end # end valid csvs
 	end # end test method 
@@ -214,20 +212,20 @@ class StateModelCreator__tests < Test::Unit::TestCase
   #
 	def test_random_walk_simple
 		smc = StateModelCreator.new
-		smc.load_table(@path + TEST1_CSV)
+		sm = smc.load_table(@path + TEST1_CSV)
 		
 		# Check standard length walk
-		the_walk = smc.random_walk("STATEA")
+		the_walk = sm.random_walk("STATEA")
 		assert_equal(Walk.new.class ,               the_walk.class ,              "Check random walk returns Walk instance" )
 		assert_equal(StateModelCreator::MAX_STEPS , the_walk.transitions.length , "Check Walks to the maximum in a loop.")
 		
 		# Check limited length walk
-		the_walk = smc.random_walk("STATEA",5)
+		the_walk = sm.random_walk("STATEA",5)
 		assert_equal(5 , the_walk.transitions.length , "Check Walks to the given length in a loop.")
 
     # Check that exception raised if walk length is daft (<=2)
     assert_raises RuntimeError do
-      the_walk = smc.random_walk("STATEA" , 2)
+      the_walk = sm.random_walk("STATEA" , 2)
     end # Assert Raises
 		
 	end # end 
@@ -240,9 +238,9 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	def test_random_walk_muliple
 	  @valid_csv_files.each do |csv_file|
   		smc = StateModelCreator.new	  
-  		smc.load_table(csv_file)
+  		sm = smc.load_table(csv_file)
   		
-	    the_walk = smc.random_walk("STATEA")
+	    the_walk = sm.random_walk("STATEA")
 		
 	    # Puts it, hope there is no exceptions
 	    puts the_walk
@@ -252,9 +250,9 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	
 	  # Specific checks for coverage on this model
 	  smc = StateModelCreator.new	  
-	  smc.load_table(TEST10_CSV)
+	  sm = smc.load_table(TEST10_CSV)
 	  
-		a_walk = smc.random_walk("STATEA")
+		a_walk = sm.random_walk("STATEA")
     assert_equal(80 , a_walk.state_coverage , "Check State coverage is 80% for TEST10_CSV")
 		assert_equal(75 , a_walk.transition_coverage , "Check Transition coverage is 75% for TEST10_CSV")
 	
@@ -280,9 +278,9 @@ class StateModelCreator__tests < Test::Unit::TestCase
   #
   def test_random_walk_many_straight_steps
     smc = StateModelCreator.new
-		smc.load_table(TEST5_CSV)
+		sm = smc.load_table(TEST5_CSV)
 		
-		the_walk = smc.random_walk("STATEA")
+		the_walk = sm.random_walk("STATEA")
 
     # Check that the transitions are found (when only 1 choice) and ordered correctly
 	  trans = the_walk.transitions
@@ -334,8 +332,8 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	# The 'walk' is passed the 'driver', the walk then executes any transitions contained in the walk.
 	# Assertions are placed in the driver and therefore executed as part of this process.
 	def test_model_driver_simple
-	  system_model = StateModelCreator.new # Create model
-	  system_model.load_table(TEST10_CSV)
+	  smc = StateModelCreator.new # Create model
+	  system_model = smc.load_table(TEST10_CSV)
 	  
 		model_walk = system_model.random_walk("STATEA")  # Create walk starting at ...
 		
@@ -364,8 +362,8 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	# To allow any old code /driver to be used though - means i 
 	# can not be very specific about what i allow.
 	def test_model_driver_messy
-	  system_model = StateModelCreator.new # Create model
-	  system_model.load_table(TEST10_CSV)
+	  smc = StateModelCreator.new # Create model
+	  system_model = smc.load_table(TEST10_CSV)
 	  
 		model_walk = system_model.random_walk("STATEA")  # Create walk starting at ...
 		
@@ -381,8 +379,8 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	def test_extract_valid_transitions
 
 	  @valid_csv_files.each_index do |csv_file_index|
-  	  system_model = StateModelCreator.new # Create model
-  	  system_model.load_table(@valid_csv_files[csv_file_index])
+  	  smc = StateModelCreator.new # Create model
+  	  system_model = smc.load_table(@valid_csv_files[csv_file_index])
   	  
 		  # Test that correct number of transitions were extracted
 		  assert_equal(@valid_csv_files_transitions[csv_file_index], system_model.extract_valid_transitions.length, "Check for correct number of transitions: #{@valid_csv_files[csv_file_index]}")
@@ -391,8 +389,8 @@ class StateModelCreator__tests < Test::Unit::TestCase
     # Check specific example has correct values set
     
     # Manually create 2 transitions, These match those in TEST1_CSV
-    system_model = StateModelCreator.new # Create model
-    system_model.load_table(TEST1_CSV)
+    smc = StateModelCreator.new # Create model
+    system_model = smc.load_table(TEST1_CSV)
     
     correct_transition1=TransitionHolder.new("STATEA","action1","STATEB")
     correct_transition2=TransitionHolder.new("STATEB","action2","STATEA")

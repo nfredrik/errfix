@@ -45,8 +45,7 @@ class StateModelCreator
 	# GraphViz stuff
 	STATE_SHAPE="ellipse"
 	
-	# Walk related
-	MAX_STEPS=20
+
 	
 	# Exceptions
   MISSING_CSV="Missing CSV file"
@@ -196,41 +195,6 @@ private
 		return adj_matrix
 	end # end def 
 
-	def random_steps(the_walk, steps_limit)
-	  if (the_walk.length >= steps_limit)
-	    return the_walk
-	  else 
-	    
-	    # Get the 'current' state of the walk
-	    if (the_walk.length == 0)
-	      # If just started then its the start state
-	      current_state = the_walk.start_state
-      else
-        # Otherwise its the the end state of the last transition
-	      current_state = the_walk.last_added.end_state
-      end
-	    actions = get_actions_for_state(current_state)
-
-			if (actions.length==0)
-				the_walk.end_state=current_state
-				return the_walk
-			else
-
-			  # Choose an option at random
-				choice=rand(actions.length)
-				next_state = self.adjacency_matrix[current_state][choice].end_state
-				action = self.adjacency_matrix[current_state][choice].action
-				
-				the_walk.transitions.push TransitionHolder.new(current_state,action,next_state)
-				
-				# Make the next step
-				random_steps(the_walk,steps_limit)
-				
-		  end # end actions
-    end # else
-	    
-	end # end method steps
-
 public 
 
 #
@@ -252,8 +216,13 @@ public
     # Detect dimensions of state table.
      #detect_state_table_dim(csv_state_table)
 		# Read in the CSV data, and store in hash (adjacency matrix)
-		self.adjacency_matrix= create_adjacency_matrix(read_csv_file(csv_state_table))
-		return self
+		the_state_machine = StateMachine.new
+		the_state_machine.adjacency_matrix= create_adjacency_matrix(read_csv_file(csv_state_table))
+		
+		# Give the statemachine the statestore, its used in random walks etc
+		the_state_machine.states_store=self.states_store
+		
+		return the_state_machine
 		
   end # end method
 
@@ -295,178 +264,7 @@ public
   
   end # end method
 
-#
-# List on standard out each state and the actions associated with it
-#
-	def to_s
-		out_str ="States, and their Actions:"
-		self.adjacency_matrix.each_key do |a_state|
-			out_str << "\nState: #{a_state}\n"
-			out_str << "Actions:\n"
-			if self.adjacency_matrix[a_state].length == 0
-				out_str << "\t<No Actions>\n"
-			else
-				self.adjacency_matrix[a_state].each do |a_transition|
-					out_str << "\t#{a_transition.action}\n"
-				end # end each
-					 	
-			end # end else
-		end # end each key
-		return out_str
-	end # end method
 
-
-#
-#  call-seq:
-#     statemodel.create_dot_graph -> Graph
-#
-#  Returns a Graph object, containing DOT language representations of the state model.
-#     
-#
-	def create_dot_graph
-
-		# Create the base object, then add edges/nodes later etc
-		my_graph = Graph.new
-		my_graph.name= "State_Model"
-		my_graph.node_style= :ellipse
-		my_graph.type = :digraph
-
-		# For each entry in the Adjacency matrix extract the relationships and add the graph edges.
-		self.adjacency_matrix.each_key do |table_key|
-			transition_list=self.adjacency_matrix[table_key]
-			transition_list.each do |transition|
-				my_graph.add_edge(transition.start_state , transition.end_state , " #{transition.action} ")
-			end # end add transitions
-		end # end add nodes
-	
-		return my_graph
-	end # end create graph
-
-# 
-#  call-seq:
-#     statemodel.get_actions_for_state("A_STATE") -> Array
-#
-# Returns an array of Strings, representing each action available from the passed state.
-#
-	def get_actions_for_state(a_state)
-		actions_list=Array.new	
-		self.adjacency_matrix[a_state].each do |a_transition|
-			actions_list.push a_transition.action	
-		end # end each
-		return actions_list	
-	end # end state
-
-#
-#  call-seq:
-#     statemodel.calc_state_coverage(a_walk) -> float
-#
-#  Returns a float  representing the percentage of states covered by a given walk
-#     
-#
-	def calc_state_coverage(a_walk)
-	  
-	  puts_debug("Calculating State Coverage")
-	  # Collate a list of states
-		walk_states=Array.new
-		a_walk.transitions.each do |a_trans| 
-			walk_states.push a_trans.start_state
-			walk_states.push a_trans.end_state
-		end # end a walk
-		
-		# Number of unique states in walk
-		walk_states = walk_states.uniq
-		
-		puts_debug "Walk_states uniq: #{walk_states}"
-		puts_debug "States Store:     #{states_store}"
-		
-		# Calc the percentage 
-		return (walk_states.length.to_f/self.states_store.length.to_f)*100
-	end # end calc
-
-  #  call-seq:
-  #     statemodel.calc_transition_coverage(a_walk) -> float
-  #
-  #  Returns a float  representing the percentage of transitions covered by a given walk
-  #     
-  #
-  def calc_transition_coverage(a_walk)
-    
-    puts_debug "\nCalculating Transition Coverage"
-    num_walk_trans=a_walk.transitions_uniq.length
-    puts_debug "Number of Unique Transitions in Walk: #{num_walk_trans}"
-    
-    all_transitions=extract_valid_transitions
-    puts_debug "Number of Transitions in model: #{all_transitions.length}"
-
-    return (num_walk_trans.to_f / all_transitions.length.to_f )*100
-
-  end # end method
-
-  def extract_valid_transitions
-    # Find valid transitions
-    # Adjacency matrix is keyed by State, and values are arrays of transitions.
-    # Therefore to get Transitions you need to cull the dead-end states.
-    transitions_in_model=Array.new
-		self.adjacency_matrix.each_key do |a_state|
-			if self.adjacency_matrix[a_state].length == 0
-			    # Ignore if no actions, as this is not a transition, just a dead end
-			  else
-				  self.adjacency_matrix[a_state].each do |a_transition|
-					  transitions_in_model.push a_transition
-				  end # end each 	
-			end # end else
-		end # end each key
-		
-		return transitions_in_model
-  end # extract valid transitions
-
-#  call-seq:
-#     statemodel.random_walk("START_STATE") -> Walk
-#
-# Create a random walk over the model, starting at START_STATE
-#
-# Returns a Walk object containing each transition off the random walk.
-# Walk objects can then be used to 'drive' your System Under Test or framework driver code.
-# 
-# By default the walk will have a length of MAX_STEPS unless a dead end is reached first.
-# This can be overridden by passing a second Integer argument.
-	def random_walk(start_state, steps_limit=MAX_STEPS)
-	
-	  # Check Start State exists in model etc
-	  matches=0
-	  self.states_store.each do |a_state|
-	    if a_state==start_state
-	      matches += 1
-	    end # end if
-	  end # end each state
-	  raise "Missing Start State Exception" if matches==0
-	  raise "Duplicate Start States in States Store" if matches > 1
-	
-	  raise "Step Limit is too low at #{steps_limit}" unless steps_limit > 2
-	
-	  # transitions store is used to hold a unique list of 'walked' transitions and their states.
-		transitions_store = Hash.new
-		
-		# Random walk create object to store the walk details	
-		a_walk=Walk.new(Walk::RANDOM)
-		a_walk.start_state=start_state
-
-    # Call the random steps code to actually make the 'steps'
-    complete_walk = random_steps(a_walk, steps_limit)
-
-
-		# Calculate state coverage for this walk	
-	  complete_walk.state_coverage=calc_state_coverage(a_walk)
-	  complete_walk.transition_coverage=calc_transition_coverage(a_walk)
-		
-		puts_debug "This walk has coverage metrics of:"
-		if self.debug
-			printf "\tState coverage: %3.1f%\n" , complete_walk.state_coverage			
-		  printf "\tTransition coverage: %3.1f%\n" , complete_walk.transition_coverage
-		end # end if
-		
-		return complete_walk
-	end # end def	
 	
 end # class
 
@@ -647,12 +445,246 @@ class Graph
   
 end # class
 
+
+
+
+
 class StateMachine
   
-  def initialize
+  # Walk related
+	MAX_STEPS=20
+  
+  
+  def initialize(debug_val=false)
+    self.debug=debug_val
     @actions=Array.new
     @states=Array.new
   end # end init
+  
+  attr_accessor(:adjacency_matrix,:states_store,:the_dot_graph, :debug)
+  
+  
+  # Internal method for debug
+  #
+    def puts_debug(msg)
+      if (self.debug) 
+        puts msg
+      end # end debug
+    end # end msg
+  
+  
+  #
+  # List on standard out each state and the actions associated with it
+  #
+  	def to_s
+  		out_str ="States, and their Actions:"
+  		self.adjacency_matrix.each_key do |a_state|
+  			out_str << "\nState: #{a_state}\n"
+  			out_str << "Actions:\n"
+  			if self.adjacency_matrix[a_state].length == 0
+  				out_str << "\t<No Actions>\n"
+  			else
+  				self.adjacency_matrix[a_state].each do |a_transition|
+  					out_str << "\t#{a_transition.action}\n"
+  				end # end each
+
+  			end # end else
+  		end # end each key
+  		return out_str
+  	end # end method
+  
+  
+  
+  
+    #
+    #  call-seq:
+    #     statemodel.create_dot_graph -> Graph
+    #
+    #  Returns a Graph object, containing DOT language representations of the state model.
+    #     
+    #
+    def create_dot_graph
+
+    	# Create the base object, then add edges/nodes later etc
+    	my_graph = Graph.new
+    	my_graph.name= "State_Model"
+    	my_graph.node_style= :ellipse
+    	my_graph.type = :digraph
+
+    	# For each entry in the Adjacency matrix extract the relationships and add the graph edges.
+    	self.adjacency_matrix.each_key do |table_key|
+    		transition_list=self.adjacency_matrix[table_key]
+    		transition_list.each do |transition|
+    			my_graph.add_edge(transition.start_state , transition.end_state , " #{transition.action} ")
+    		end # end add transitions
+    	end # end add nodes
+
+    	return my_graph
+    end # end create graph
+
+    # 
+    #  call-seq:
+    #     statemodel.get_actions_for_state("A_STATE") -> Array
+    #
+    # Returns an array of Strings, representing each action available from the passed state.
+    #
+    def get_actions_for_state(a_state)
+    	actions_list=Array.new	
+    	self.adjacency_matrix[a_state].each do |a_transition|
+    		actions_list.push a_transition.action	
+    	end # end each
+    	return actions_list	
+    end # end state
+  
+  
+    #
+    #  call-seq:
+    #     statemodel.calc_state_coverage(a_walk) -> float
+    #
+    #  Returns a float  representing the percentage of states covered by a given walk
+    #     
+    #
+    def calc_state_coverage(a_walk)
+
+      puts_debug("Calculating State Coverage")
+      # Collate a list of states
+      walk_states=Array.new
+    	a_walk.transitions.each do |a_trans| 
+      	walk_states.push a_trans.start_state
+      	walk_states.push a_trans.end_state
+      end # end a walk
+
+      # Number of unique states in walk
+      walk_states = walk_states.uniq
+
+      puts_debug "Walk_states uniq: #{walk_states}"
+      puts_debug "States Store:     #{states_store}"
+
+  		# Calc the percentage 
+  		return (walk_states.length.to_f/self.states_store.length.to_f)*100
+    end # end calc
+
+      #  call-seq:
+      #     statemodel.calc_transition_coverage(a_walk) -> float
+      #        #  Returns a float  representing the percentage of transitions covered by a given walk
+       #     
+      #
+    def calc_transition_coverage(a_walk)
+      puts_debug "\nCalculating Transition Coverage"
+      num_walk_trans=a_walk.transitions_uniq.length
+      puts_debug "Number of Unique Transitions in Walk: #{num_walk_trans}"
+
+      all_transitions=extract_valid_transitions
+      puts_debug "Number of Transitions in model: #{all_transitions.length}"
+
+      return (num_walk_trans.to_f / all_transitions.length.to_f )*100
+
+    end # end method
+
+  
+
+    def extract_valid_transitions
+      # Find valid transitions
+      # Adjacency matrix is keyed by State, and values are arrays of transitions.
+      # Therefore to get Transitions you need to cull the dead-end states.
+      transitions_in_model=Array.new
+  		self.adjacency_matrix.each_key do |a_state|
+			  if self.adjacency_matrix[a_state].length == 0
+			      			    # Ignore if no actions, as this is not a transition, just a dead end
+        else
+    	    self.adjacency_matrix[a_state].each do |a_transition|
+        	  transitions_in_model.push a_transition
+        	end # end each 	
+        end # end else
+      end # end each key
+
+      return transitions_in_model
+    end # extract valid transitions
+
+#  call-seq:
+#     statemodel.random_walk("START_STATE") -> Walk
+        #
+        # Create a random walk over the model, starting at START_STATE
+        #
+        # Returns a Walk object containing each transition off the random walk.
+        # Walk objects can then be used to 'drive' your System Under Test or framework driver code.
+        # 
+        # By default the walk will have a length of MAX_STEPS unless a dead end is reached first.
+        # This can be overridden by passing a second Integer argument.
+    def random_walk(start_state, steps_limit=MAX_STEPS)
+
+      # Check Start State exists in model etc
+      matches=0
+      self.states_store.each do |a_state|
+        if a_state==start_state
+          matches += 1
+        end # end if
+      end # end each state
+      raise "Missing Start State Exception" if matches==0
+      raise "Duplicate Start States in States Store" if matches > 1
+
+  	  raise "Step Limit is too low at #{steps_limit}" unless steps_limit > 2
+
+  	  # transitions store is used to hold a unique list of 'walked' transitions and their states.
+  		transitions_store = Hash.new
+
+  		# Random walk create object to store the walk details	
+  		a_walk=Walk.new(Walk::RANDOM)
+  		a_walk.start_state=start_state
+
+      # Call the random steps code to actually make the 'steps'
+      complete_walk = random_steps(a_walk, steps_limit)
+
+
+  		# Calculate state coverage for this walk	
+  	  complete_walk.state_coverage=calc_state_coverage(a_walk)
+  	  complete_walk.transition_coverage=calc_transition_coverage(a_walk)
+
+  		puts_debug "This walk has coverage metrics of:"
+  		if self.debug
+  			printf "\tState coverage: %3.1f%\n" , complete_walk.state_coverage			
+  		  printf "\tTransition coverage: %3.1f%\n" , complete_walk.transition_coverage
+  		end # end if
+
+  		return complete_walk
+  	end # end def	
+
+  
+    def random_steps(the_walk, steps_limit)
+      if (the_walk.length >= steps_limit)
+        return the_walk
+      else 
+
+      # Get the 'current' state of the walk
+      if (the_walk.length == 0)
+        # If just started then its the start state
+        current_state = the_walk.start_state
+      else
+        # Otherwise its the the end state of the last transition
+        current_state = the_walk.last_added.end_state
+      end
+      actions = get_actions_for_state(current_state)
+
+      if (actions.length==0)
+        the_walk.end_state=current_state
+        return the_walk
+      else
+
+        # Choose an option at random
+        choice=rand(actions.length)
+        next_state = self.adjacency_matrix[current_state][choice].end_state
+        action = self.adjacency_matrix[current_state][choice].action
+
+        the_walk.transitions.push TransitionHolder.new(current_state,action,next_state)
+
+        # Make the next step
+        random_steps(the_walk,steps_limit)
+
+  		end # end actions
+    end # else
+  end # end method steps
+
+  
   
   def actions
     return @actions

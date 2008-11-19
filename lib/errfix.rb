@@ -205,7 +205,13 @@ public
 
 		# Output debug?
 		self.debug= debug_flag
-
+		
+		# Needed for DSL:
+    @actions=Array.new
+    @states=Array.new
+    @temp_transition_list=Array.new
+    @state_machine=StateMachine.new
+    
 	end # end def
 
 #
@@ -214,15 +220,15 @@ public
   def load_table(csv_state_table)
     
     # Detect dimensions of state table.
-     #detect_state_table_dim(csv_state_table)
+    # detect_state_table_dim(csv_state_table)
 		# Read in the CSV data, and store in hash (adjacency matrix)
-		the_state_machine = StateMachine.new
-		the_state_machine.adjacency_matrix= create_adjacency_matrix(read_csv_file(csv_state_table))
+		# the_state_machine = StateMachine.new
+		@state_machine.adjacency_matrix= create_adjacency_matrix(read_csv_file(csv_state_table))
 		
 		# Give the statemachine the statestore, its used in random walks etc
-		the_state_machine.states_store=self.states_store
+		@state_machine.states_store=self.states_store
 		
-		return the_state_machine
+		return @state_machine
 		
   end # end method
 
@@ -264,6 +270,54 @@ public
   
   end # end method
 
+ 
+  def actions
+    return @actions
+  end # end actions
+  
+  def state_machine
+    # Give the statemachine the statestore, its used in random walks etc
+    @state_machine.adjacency_matrix=create_adjacency_matrix(@temp_transition_list)
+    @state_machine.states_store=self.states_store
+		
+    return @state_machine
+  end # end return state_machine
+  
+ # def attach_start_state(action_name)
+  #  attach_state(:start)
+  #end # end attach
+  
+  def attach_transition( start_state, action_name, end_state)
+    if !@actions.include?(action_name)
+      raise "Action not found"
+    end # end if  
+    
+    # store states, useful for debugging
+    @states.push start_state
+    @states.push end_state
+    
+    # store transitions, for later use
+    @temp_transition_list.push TransitionHolder.new(start_state,action_name,end_state)
+  end # end action
+  
+  # returns list of unique states
+  def states
+    return @states.uniq
+  end # end states
+  
+  def define_action(action_name)
+
+    @actions.push action_name  
+    self.state_machine.class.send(:define_method , action_name) do 
+      begin
+        puts "Action: #{action_name}"
+        yield
+      rescue LocalJumpError 
+        # ignore, this is just a plain action.
+      end # end rescue
+    end # end proc
+    
+  end # end add action
 
 	
 end # class
@@ -457,8 +511,7 @@ class StateMachine
   
   def initialize(debug_val=false)
     self.debug=debug_val
-    @actions=Array.new
-    @states=Array.new
+
   end # end init
   
   attr_accessor(:adjacency_matrix,:states_store,:the_dot_graph, :debug)
@@ -564,11 +617,11 @@ class StateMachine
   		return (walk_states.length.to_f/self.states_store.length.to_f)*100
     end # end calc
 
-      #  call-seq:
-      #     statemodel.calc_transition_coverage(a_walk) -> float
-      #        #  Returns a float  representing the percentage of transitions covered by a given walk
-       #     
-      #
+    #  call-seq:
+    #     statemodel.calc_transition_coverage(a_walk) -> float
+    #        #  Returns a float  representing the percentage of transitions covered by a given walk
+    #     
+    #
     def calc_transition_coverage(a_walk)
       puts_debug "\nCalculating Transition Coverage"
       num_walk_trans=a_walk.transitions_uniq.length
@@ -603,14 +656,14 @@ class StateMachine
 
 #  call-seq:
 #     statemodel.random_walk("START_STATE") -> Walk
-        #
-        # Create a random walk over the model, starting at START_STATE
-        #
-        # Returns a Walk object containing each transition off the random walk.
-        # Walk objects can then be used to 'drive' your System Under Test or framework driver code.
-        # 
-        # By default the walk will have a length of MAX_STEPS unless a dead end is reached first.
-        # This can be overridden by passing a second Integer argument.
+#
+# Create a random walk over the model, starting at START_STATE
+#
+# Returns a Walk object containing each transition off the random walk.
+# Walk objects can then be used to 'drive' your System Under Test or framework driver code.
+# 
+# By default the walk will have a length of MAX_STEPS unless a dead end is reached first.
+# This can be overridden by passing a second Integer argument.
     def random_walk(start_state, steps_limit=MAX_STEPS)
 
       # Check Start State exists in model etc
@@ -685,40 +738,7 @@ class StateMachine
   end # end method steps
 
   
-  
-  def actions
-    return @actions
-  end # end actions
-  
-  def attach_start_state(action_name)
-    attach_state(:start)
-  end # end attach
-  
-  def attach_states(action_name, start_state, end_state)
-    if !@actions.include?(action_name)
-      raise "Action not found"
-    end # end if  
-    transition = TransitionHolder.new(start_state,action_name,end_state)
-  end # end action
-  
-  def states
-    return @states
-  end # end states
-  
-  def define_action(action_name)
-
-    @actions.push action_name  
-    self.class.send(:define_method , action_name) do 
-      begin
-        puts "Action: #{action_name}"
-        yield
-      rescue LocalJumpError 
-        # ignore, this is just a plain action.
-      end # end rescue
-    end # end proc
-    
-  end # end add action
-  
+   
 end # end class
 
 

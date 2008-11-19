@@ -33,52 +33,9 @@ class BSM__tests < Test::Unit::TestCase
     # no setup
 	end # end setup
 
-  def test_action_simple_action_define
-    myfsm = StateMachine.new
-    myfsm.define_action :action1 do
-        puts "stuff"
-      end # end add action
-    
-    assert_equal(:action1 , myfsm.actions[0], "Check name of loose action")
-    
-    # Check method there by just calling it...
-    myfsm.action1
-    # Hopefully that did not throw an exception.
-    #assert(myfsm.test1_action==15 , "Check blocks return value is ok.")
-    
-    # Lets add another
-    myfsm.define_action :action2
-    myfsm.action2
-    assert(myfsm.actions.length==2, "Check 2 entries added to actions list")
-    
-  end # end test
-
-  def test_state_simple_transition_define
-    
-    myfsm = StateMachine.new
-    myfsm.define_action :action1 do
-        puts "stuff"
-      end # end add action
-    
-    # Create a transition
-    myfsm.attach_states(:action1 , :STATEA , :STATEB)
-    # Check states were added
-    assert(myfsm.states_store.include?(:STATEA) , "Check STATEA added")
-    assert(myfsm.states_store.include?(:STATEB) , "Check STATEB added")
-  end # end test  
-    
-  def test_state_simple_transition_missing
-    
-    myfsm = StateMachine.new
-    
-    # If an action isn't there should throw an exception
-    # 
-    assert_raises RuntimeError do
-      returned_obj = myfsm.attach_states(:state1 , :action3 , :state2)
-    end # end assert
-    
-  end # end state test
-  
+ 
+     
+ 
   
 	def teardown
 	end # end teardown/clearup

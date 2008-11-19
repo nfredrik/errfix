@@ -260,7 +260,7 @@ class StateModelCreator__tests < Test::Unit::TestCase
   
   # Walk-State and transition coverage
   #
-  # Sanity check that the values are within relaistic constraints
+  # Sanity check that the values are within realistic constraints
   #
   def check_coverage_stats(the_walk)
 		# Check coverage stats are sane.
@@ -414,6 +414,87 @@ class StateModelCreator__tests < Test::Unit::TestCase
     
   end # end test mthod
 	
+	
+	
+  # DSL Stuff
+  #
+  def test_state_simple_transition_define
+
+     myfsmc = StateModelCreator.new
+     myfsmc.define_action :action1 do
+         puts "stuff"
+       end # end add action
+
+     # Create a transition
+     myfsmc.attach_transition(:STATEA ,:action1 ,:STATEB)
+     # Check states were added
+     assert(myfsmc.states.include?(:STATEA) , "Check STATEA added")
+     assert(myfsmc.states.include?(:STATEB) , "Check STATEB added")
+   end # end test  
+
+
+    # If an action isn't there should throw an exception
+    #
+    def test_state_simple_transition_missing
+
+      myfsmc = StateModelCreator.new
+      assert_raises RuntimeError do
+        returned_obj = myfsmc.attach_transition(:state1 , :action3 , :state2)
+      end # end assert
+
+    end # end state test
+
+    def test_action_simple_action_define
+       myfsmc = StateModelCreator.new
+       myfsmc.define_action :action1 do
+           puts "stuff"
+         end # end add action
+
+       assert_equal(:action1 , myfsmc.actions[0], "Check name of loose action")
+
+       # Check method there by just calling it...
+       myfsmc.state_machine.action1
+       # Hopefully that did not throw an exception.
+
+       # Lets add another
+       myfsmc.define_action :action2
+       
+       # Check they have both been added (low rent test)
+       assert(myfsmc.actions.length==2, "Check 2 entries added to actions list")
+       
+       the_state_machine = myfsmc.state_machine
+       the_state_machine.action2
+       
+
+     end # end test
+
+   	def test_random_walk_simple_dsl
+   		smc = StateModelCreator.new
+   		smc.define_action :action1
+      smc.define_action :action2
+   		smc.attach_transition(:STATEA,:action1,:STATEB)
+   		smc.attach_transition(:STATEB,:action2,:STATEA)
+   		sm = smc.state_machine
+      
+      assert_equal(2 , sm.states_store.length , "Check for 2 states")
+
+   		# Check standard length walk
+   		the_walk = sm.random_walk(:STATEA)
+   		assert_equal(Walk.new.class ,               the_walk.class ,              "Check random walk returns Walk instance" )
+   		assert_equal(StateMachine::MAX_STEPS , the_walk.transitions.length , "Check Walks to the maximum in a loop.")
+
+   		# Check limited length walk
+   		the_walk = sm.random_walk(:STATEA,5)
+   		assert_equal(5 , the_walk.transitions.length , "Check Walks to the given length in a loop.")
+
+       # Check that exception raised if walk length is daft (<=2)
+       assert_raises RuntimeError do
+         the_walk = sm.random_walk(:STATEA , 2)
+       end # Assert Raises
+
+   	end # end 
+
+
 	def teardown
 	end # end teardown/clearup
 	

@@ -47,6 +47,10 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	TEST9_2d_CSV="test9_2d.csv"           # Line with loop backs, DOS Format txt
   TEST10_2d_CSV="test10_2d.csv"         # Line with fork, DOS format txt
 	
+	# DSL version of the above:  
+	TEST9_DSL="test9_dsl.rb"           # Line with loop backs, DOS Format txt
+	TEST10_DSL="test10_dsl.rb"  # Line with fork, DOS format txt
+	
   
 	def setup
 	  @path = File.expand_path(File.dirname(__FILE__) + "/../test")
@@ -182,12 +186,15 @@ class StateModelCreator__tests < Test::Unit::TestCase
     end # end each file
 	end # end test
 
+
+
+
   # Create Dot Graph
   # 
-  # Creates dot graph (GraphViz) and then checks that it can be sritten out.
+  # Creates dot graph (GraphViz) and then checks that it can be written out.
   # This helps to ensure its a kosher graphviz object.
   #
-  def test_create_dot_graph
+  def test_create_dot_graph_csv
     @valid_csv_files.each do |csv_file|
       puts csv_file
       smc = StateModelCreator.new
@@ -207,6 +214,36 @@ class StateModelCreator__tests < Test::Unit::TestCase
 		  
 	  end # end valid csvs
 	end # end test method 
+
+  # Create Dot Graph
+  # 
+  # Creates dot graph (GraphViz) and then checks that it can be written out.
+  # This helps to ensure its a kosher graphviz object.
+  #
+  
+  def build_dsl_10
+    smc =StateModelCreator.new
+     smc.define_action :action1
+     smc.define_action :action2
+     smc.define_action :action3
+     smc.define_action :action4
+     smc.attach_transition(:STATEA,:action1,:STATEB)
+     smc.attach_transition(:STATEB,:action2,:STATEC)
+     smc.attach_transition(:STATEC,:action3,:STATED)
+     smc.attach_transition(:STATEC,:action4,:STATEE)
+     sm = smc.state_machine
+     return sm
+  end # end def
+  
+  def test_create_dot_graph_csv
+    sm = build_dsl_10
+	  sm_graph = sm.create_dot_graph	
+	  sm_graph.output("test10_dsl.dot")
+	  assert(File.exist?("test10_dsl.dot"),"Check the graph file: test10_dsl.dot was written out.")
+	
+ 	end # end method
+   	   
+
 
   # Random Walk
   #
@@ -331,9 +368,9 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	# drive_using can directly control a sut driver object and follow a given walk.
 	# The 'walk' is passed the 'driver', the walk then executes any transitions contained in the walk.
 	# Assertions are placed in the driver and therefore executed as part of this process.
-	def test_model_driver_simple
+	def test_model_driver_simple_csv
 	  smc = StateModelCreator.new # Create model
-	  system_model = smc.load_table(TEST10_CSV)
+	  system_model = smc.load_table(@path + TEST10_CSV)
 	  
 		model_walk = system_model.random_walk("STATEA")  # Create walk starting at ...
 		
@@ -354,6 +391,32 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	  assert_equal(sut_driver.states_tested , models_states)
 	  
   end # end driver tests
+	
+	def test_model_driver_simple_dsl
+	  
+	  system_model = build_dsl_10  # Create model
+	  
+		model_walk = system_model.random_walk(:STATEA)  # Create walk starting at ...
+		
+		sut_driver = EgTestDriver.new     # Instantiate your target system's test driver
+		model_walk.drive_using sut_driver # Apply the 'Walk' to your driver code.
+		# Ensure correct transitions were followed, in correct order
+	  assert_equal(sut_driver.transitions_travelled , model_walk.transitions)
+	  
+	  # Compile list of states that should get tested in the SUT
+	  models_states=Array.new
+	  model_walk.transitions.each do |a_transition|
+	    if models_states.length==0
+	      models_states.push a_transition.start_state
+	    end # if first state
+	    models_states.push a_transition.end_state
+    end # end do trans
+    
+	  assert_equal(sut_driver.states_tested , models_states)
+	  
+  end # end driver tests
+	
+	
 	
 	
 	# Drive Using
@@ -492,7 +555,9 @@ class StateModelCreator__tests < Test::Unit::TestCase
          the_walk = sm.random_walk(:STATEA , 2)
        end # Assert Raises
 
-   	end # end 
+   	end # end
+   	
+
 
 
 	def teardown

@@ -209,6 +209,7 @@ public
 		# Needed for DSL:
     @actions=Array.new
     @states=Array.new
+    @guards=Array.new
     @temp_transition_list=Array.new
     @state_machine=StateMachine.new
     
@@ -310,14 +311,40 @@ public
     @actions.push action_name  
     self.state_machine.class.send(:define_method , action_name) do 
       begin
-        puts "Action: #{action_name}"
+        puts_debug "Action: #{action_name}"
         yield
       rescue LocalJumpError 
         # ignore, this is just a plain action.
       end # end rescue
+      
+      # whats the new state...
+      puts_debug self.adjacency_matrix
+      
+      self.adjacency_matrix[self.state].each do |current_transition|
+        if current_transition.action==action_name          
+          self.state=current_transition.end_state          
+        end # end if
+      end # end each
+      
+      # Subtlely return the new state...
+      self.state
+      
     end # end proc
     
   end # end add action
+
+  def define_guard_on(action_name)
+    @guards.push action_name  
+     self.state_machine.class.send(:define_method , "guard_on__#{action_name.to_s}") do 
+       begin
+         puts_debug "Guard on: #{action_name}"
+         return yield
+       rescue LocalJumpError 
+         # ignore, this is just a plain action.
+       end # end rescue
+     end # end proc
+    
+  end # end define guard
 
 	
 end # class
@@ -386,15 +413,15 @@ class Walk
     raise "Array - Not be a SUT Driver: Error" if (sut_driver.class==Array.new.class) 
     
     # Test/verify start state is valid
-    sut_driver.send("test_" + self.start_state)
+    sut_driver.send("test_" + self.start_state.to_s)
     
     # Loop through transitions
     self.transitions.each do |a_transition|
       
       # Run each action
-      sut_driver.send(a_transition.action)
+      sut_driver.send(a_transition.action.to_s)
       # Test/verify arrival at resulting state
-      sut_driver.send("test_" + a_transition.end_state)
+      sut_driver.send("test_" + a_transition.end_state.to_s)
       
     end # end Loop block
     
@@ -514,7 +541,7 @@ class StateMachine
 
   end # end init
   
-  attr_accessor(:adjacency_matrix,:states_store,:the_dot_graph, :debug)
+  attr_accessor(:adjacency_matrix,:states_store,:the_dot_graph, :state, :debug)
   
   
   # Internal method for debug
@@ -616,6 +643,8 @@ class StateMachine
   		# Calc the percentage 
   		return (walk_states.length.to_f/self.states_store.length.to_f)*100
     end # end calc
+
+
 
     #  call-seq:
     #     statemodel.calc_transition_coverage(a_walk) -> float

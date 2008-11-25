@@ -235,7 +235,7 @@ class StateModelCreator__tests < Test::Unit::TestCase
      return sm
   end # end def
   
-  def test_create_dot_graph_csv
+  def test_create_dot_graph_dsl
     sm = build_dsl_10
 	  sm_graph = sm.create_dot_graph	
 	  sm_graph.output("test10_dsl.dot")
@@ -398,7 +398,7 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	  
 		model_walk = system_model.random_walk(:STATEA)  # Create walk starting at ...
 		
-		sut_driver = EgTestDriver.new     # Instantiate your target system's test driver
+		sut_driver = EgTestDriver.new(true)     # Instantiate your target system's test driver
 		model_walk.drive_using sut_driver # Apply the 'Walk' to your driver code.
 		# Ensure correct transitions were followed, in correct order
 	  assert_equal(sut_driver.transitions_travelled , model_walk.transitions)
@@ -515,12 +515,22 @@ class StateModelCreator__tests < Test::Unit::TestCase
 
        assert_equal(:action1 , myfsmc.actions[0], "Check name of loose action")
 
+       myfsmc.attach_transition(:STATEA, :action1 , :STATEB)
+       
+       
+       
        # Check method there by just calling it...
-       myfsmc.state_machine.action1
+       sm = myfsmc.state_machine
+       sm.state=:STATEA
+       assert_equal(:STATEB , sm.action1 , "Check new state is STATEB")
        # Hopefully that did not throw an exception.
+
 
        # Lets add another
        myfsmc.define_action :action2
+       myfsmc.attach_transition(:STATEA, :action2 , :STATEB)
+       sm = myfsmc.state_machine
+       sm.state=:STATEA
        
        # Check they have both been added (low rent test)
        assert(myfsmc.actions.length==2, "Check 2 entries added to actions list")
@@ -556,9 +566,22 @@ class StateModelCreator__tests < Test::Unit::TestCase
        end # Assert Raises
 
    	end # end
-   	
 
+   	def test_steps_simple_dsl
+   		smc = StateModelCreator.new
+   		smc.define_action :action1
+      smc.define_action :action2
+   		smc.attach_transition(:STATEA,:action1,:STATEB)
+   		smc.attach_transition(:STATEB,:action2,:STATEA)
+   		system_model = smc.state_machine
 
+      system_model.state = :STATEA
+      new_state = system_model.action1
+      assert(new_state==:STATEB, "Check action1 transitioned to STATEB - returned value")
+      assert(system_model.state==:STATEB, "Check action1 transitioned to STATEB - state value")
+      
+
+    end # end def
 
 	def teardown
 	end # end teardown/clearup

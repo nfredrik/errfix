@@ -522,9 +522,9 @@ class StateModelCreator__tests < Test::Unit::TestCase
        # Check method there by just calling it...
        sm = myfsmc.state_machine
        sm.state=:STATEA
-       assert_equal(:STATEB , sm.action1 , "Check new state is STATEB")
+       assert_equal(:STATEB , sm.action1 , "Check new state is STATEB, using return from StateMachine#action_name")
+       assert_equal(:STATEB , sm.state , "Check new state is STATEB, using StateMachine#state")
        # Hopefully that did not throw an exception.
-
 
        # Lets add another
        myfsmc.define_action :action2

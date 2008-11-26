@@ -30,47 +30,73 @@ require 'errfix'
 #
 class EgTestDriver
 
-  def initialize
+  def initialize(use_symbols=false)
     @transitions_list=Array.new
     @states_list=Array.new
+    @symbols=use_symbols
   end # end initialize
   
+  def push_states(state_sym,state_str)
+    if @symbols
+      @states_list.push state_sym
+    else
+      @states_list.push state_str
+    end # end if
+  end # end emthod
+  
   # Test state methods, record that they were touched...
-  def test_STATEA
-    @states_list.push "STATEA"
+  def test_STATEA  
+    push_states(:STATEA , "STATEA")
   end # end test state
   
   def test_STATEB
-    @states_list.push "STATEB"
+    push_states(:STATEB , "STATEB")
   end # end test state
   
   def test_STATEC
-    @states_list.push "STATEC"
+    push_states(:STATEC , "STATEC")
   end # end test state
   
   def test_STATED
-    @states_list.push "STATED"
+    push_states(:STATED , "STATED")
   end # end test state
   
   def test_STATEE
-    @states_list.push "STATEE"
+    push_states(:STATEE , "STATEE")
   end # end test state
+  
   
   # Actions, record that they were touched...
   def action1
-    @transitions_list.push TransitionHolder.new("STATEA","action1","STATEB")
+    if @symbols
+      @transitions_list.push TransitionHolder.new(:STATEA,:action1,:STATEB)     
+    else
+      @transitions_list.push TransitionHolder.new("STATEA","action1","STATEB")
+    end # end if
   end # end action1
 
   def action2
-    @transitions_list.push TransitionHolder.new("STATEB","action2","STATEC")
+    if @symbols
+      @transitions_list.push TransitionHolder.new(:STATEB,:action2,:STATEC)
+    else
+      @transitions_list.push TransitionHolder.new("STATEB","action2","STATEC")
+    end # end
   end # end action2
 
   def action3
-    @transitions_list.push TransitionHolder.new("STATEC","action3","STATED")
+    if @symbols
+      @transitions_list.push TransitionHolder.new(:STATEC,:action3,:STATED)
+    else
+      @transitions_list.push TransitionHolder.new("STATEC","action3","STATED")
+    end # end
   end # end action3
   
   def action4
-    @transitions_list.push TransitionHolder.new("STATEC","action4","STATEE")
+    if @symbols
+      @transitions_list.push TransitionHolder.new(:STATEC,:action4,:STATEE)
+    else
+      @transitions_list.push TransitionHolder.new("STATEC","action4","STATEE")
+    end # end
   end # end action4
 
   def states_tested

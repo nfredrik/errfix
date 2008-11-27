@@ -35,7 +35,7 @@ class BSM__tests < Test::Unit::TestCase
 
  
    	
-	def test_random_walk_guarded_simple_dsl
+	def test_guarded_simple_dsl
  		smc = StateModelCreator.new
     smc.define_action :action1 do
       @done_action1 = true
@@ -47,10 +47,12 @@ class BSM__tests < Test::Unit::TestCase
     
     smc.define_guard_on :action2 do
       if @done_action1 && !@done_action2
-        return true
+        guard=true
       else
-        return false
+        guard=false
       end # end if
+      
+      guard
     end # end guard
       
   	smc.attach_transition(:STATEA,:action1,:STATEB)
@@ -58,19 +60,23 @@ class BSM__tests < Test::Unit::TestCase
       
     sm = smc.state_machine 
     
-    assert_false(sm.guard_on__action2, "check guard returns false as default")
+    assert_equal(false , sm._guard_on_action2, "check guard returns false as default")
      
     # Create the Graphiz graph object, see if it fails...
   	sm_graph = sm.create_dot_graph	
   	sm_graph.output("test_guard_dsl_1.dot")
   	
  		# Check standard length walk
- 		the_walk = sm.random_walk(:STATEA)
- 		assert_equal(Walk.new.class ,               the_walk.class ,    "Check random walk returns Walk instance" )
+ 		#the_walk = sm.random_walk(:STATEA)
+ 		sm.state=:STATEA
+ 		assert_equal(:STATEB , sm.action1 , "Check at StateB")
+ 		assert_equal(true , sm._guard_on_action2 , "Check Guard returns correct value")
+ 		
+ 		#assert_equal(Walk.new.class ,               the_walk.class ,    "Check random walk returns Walk instance" )
  		
  		# When guards are in place, walk cn only be length 3
- 		assert_equal(3 ,the_walk.transitions.length , "Check Walk is length 3")
-    assert_equal(2 , sm.states_store.length , "Check for 2 states")  
+ 		#assert_equal(3 ,the_walk.transitions.length , "Check Walk is length 3")
+   # assert_equal(2 , sm.states_store.length , "Check for 2 states")  
       
 	  end # end test
  	
@@ -83,19 +89,19 @@ class BSM__tests < Test::Unit::TestCase
  		smc.define_guard_on :view_content do
  		  # You can only view content if you are logged in.
  		  if @logged_in
- 		    return true
-		    else
-		      return false
-		    end # end if else
-		  end # end guard
+ 		      guard true
+		  else
+		      guard false
+		  end # end if else
+		end # end guard
 
     smc.define_guard_on :click_log_in do
       # You can't log in if you are already logged in.
       if @logged_in
- 		    return false
-		    else
-		      return true
-		    end # end if else
+ 		    guard false
+		  else
+		    guard true
+		  end # end if else
     end # end guard
 
     smc.define_action :click_log_in do

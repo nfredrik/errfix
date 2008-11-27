@@ -335,7 +335,7 @@ public
 
   def define_guard_on(action_name)
     @guards.push action_name  
-     self.state_machine.class.send(:define_method , "guard_on__#{action_name.to_s}") do 
+     self.state_machine.class.send(:define_method , "_guard_on_#{action_name.to_s}") do 
        begin
          puts_debug "Guard on: #{action_name}"
          return yield
@@ -538,11 +538,12 @@ class StateMachine
   
   def initialize(debug_val=false)
     self.debug=debug_val
-
+    @guard_temp
   end # end init
   
   attr_accessor(:adjacency_matrix,:states_store,:the_dot_graph, :state, :debug)
   
+
   
   # Internal method for debug
   #
@@ -551,8 +552,7 @@ class StateMachine
         puts msg
       end # end debug
     end # end msg
-  
-  
+
   #
   # List on standard out each state and the actions associated with it
   #
@@ -573,6 +573,17 @@ class StateMachine
   		return out_str
   	end # end method
   
+    # Used to store result of guard
+     # Set in Guard definition
+     #
+     def guard(guard_result)
+       @guard_temp=guard_result
+     end # end guard method
+
+     # Get guard result, not usual getter/setter - but wanted this for simplicity of DSL
+     def get_guard
+       return @guard_temp
+     end # end method
   
   
   
@@ -766,6 +777,8 @@ class StateMachine
     end # else
   end # end method steps
 
+
+  #private
   
    
 end # end class

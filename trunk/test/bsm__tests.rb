@@ -34,7 +34,9 @@ class BSM__tests < Test::Unit::TestCase
 	end # end setup
 
  
-   	
+  # Define a simple model with guarded transitions
+  # Check guard itself
+  #
 	def test_guarded_simple_dsl
  		smc = StateModelCreator.new
     smc.define_action :action1 do
@@ -50,8 +52,7 @@ class BSM__tests < Test::Unit::TestCase
         guard=true
       else
         guard=false
-      end # end if
-      
+      end # end if   
       guard
     end # end guard
       
@@ -59,27 +60,28 @@ class BSM__tests < Test::Unit::TestCase
   	smc.attach_transition(:STATEB,:action2,:STATEA)
       
     sm = smc.state_machine 
+
+    assert(sm.guarded_actions.include?(:action2) , "Check action2 is identified as being guarded")
+    assert(!sm.guarded_actions.include?(:action1) , "Check action1 is identified as not being guarded")
     
     assert_equal(false , sm._guard_on_action2, "check guard returns false as default")
      
     # Create the Graphiz graph object, see if it fails...
   	sm_graph = sm.create_dot_graph	
-  	sm_graph.output("test_guard_dsl_1.dot")
+  	sm_graph.output("../test/test_guard_dsl_1.dot")
   	
  		# Check standard length walk
  		#the_walk = sm.random_walk(:STATEA)
  		sm.state=:STATEA
  		assert_equal(:STATEB , sm.action1 , "Check at StateB")
  		assert_equal(true , sm._guard_on_action2 , "Check Guard returns correct value")
- 		
- 		#assert_equal(Walk.new.class ,               the_walk.class ,    "Check random walk returns Walk instance" )
- 		
- 		# When guards are in place, walk cn only be length 3
- 		#assert_equal(3 ,the_walk.transitions.length , "Check Walk is length 3")
-   # assert_equal(2 , sm.states_store.length , "Check for 2 states")  
       
-	  end # end test
+	end # end test
  	
+ 	
+ 	# Define a model with guarded transitions.
+ 	# Check it is correctly navigated,
+ 	#
  	def test_random_walk_guarded_complex_dsl
  	  
  		smc = StateModelCreator.new
@@ -89,26 +91,31 @@ class BSM__tests < Test::Unit::TestCase
  		smc.define_guard_on :view_content do
  		  # You can only view content if you are logged in.
  		  if @logged_in
- 		      guard true
+ 		      guard=true
 		  else
-		      guard false
+		      guard=false
 		  end # end if else
+		  guard
 		end # end guard
 
     smc.define_guard_on :click_log_in do
       # You can't log in if you are already logged in.
       if @logged_in
- 		    guard false
+ 		    guard=false
 		  else
-		    guard true
+		    guard=true
 		  end # end if else
+		  guard
     end # end guard
 
     smc.define_action :click_log_in do
       @logged_in=true
     end # end action
     
+    smc.define_action :show_more 
+    
  		smc.attach_transition(:HOME,:view_content,:SHOWING_CONTENT)
+ 		smc.attach_transition(:SHOWING_CONTENT,:show_more,:MORE_CONTENT)
  		smc.attach_transition(:HOME,:click_log_in,:LOG_IN_COMPLETE)
  		smc.attach_transition(:LOG_IN_COMPLETE,:click_home,:HOME)
  		
@@ -116,7 +123,7 @@ class BSM__tests < Test::Unit::TestCase
  		
     # Create the Graphiz graph object, see if it fails...
 	  sm_graph = sm.create_dot_graph	
-	  sm_graph.output("test_guard_dsl_2.dot")
+	  sm_graph.output("../test/test_guard_dsl_2.dot")
     
     assert_equal(3 , sm.states_store.length , "Check for 3 states")
 
@@ -126,13 +133,10 @@ class BSM__tests < Test::Unit::TestCase
  		
  		# When guards are in place, walk cn only be length 3
  		assert_equal(3 ,the_walk.transitions.length , "Check Walk is length 3")
-
-
  	
  	end # end
 
-    
- 
+
   
 	def teardown
 	end # end teardown/clearup

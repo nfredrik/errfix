@@ -280,7 +280,7 @@ public
     # Give the statemachine the statestore, its used in random walks etc
     @state_machine.adjacency_matrix=create_adjacency_matrix(@temp_transition_list)
     @state_machine.states_store=self.states_store
-		
+		@state_machine.guarded_actions=@guards
     return @state_machine
   end # end return state_machine
   
@@ -541,9 +541,7 @@ class StateMachine
     @guard_temp
   end # end init
   
-  attr_accessor(:adjacency_matrix,:states_store,:the_dot_graph, :state, :debug)
-  
-
+  attr_accessor(:adjacency_matrix,:states_store,:the_dot_graph, :state, :debug, :guarded_actions)
   
   # Internal method for debug
   #
@@ -624,6 +622,7 @@ class StateMachine
     	self.adjacency_matrix[a_state].each do |a_transition|
     		actions_list.push a_transition.action	
     	end # end each
+    	
     	return actions_list	
     end # end state
   

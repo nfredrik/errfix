@@ -84,7 +84,7 @@ class BSM__tests < Test::Unit::TestCase
  	#
  	def test_random_walk_guarded_complex_dsl
  	  
- 		smc = StateModelCreator.new
+ 		smc = StateModelCreator.new(true)
  		smc.define_action :click_home
  		smc.define_action :view_content
 
@@ -125,11 +125,14 @@ class BSM__tests < Test::Unit::TestCase
 	  sm_graph = sm.create_dot_graph	
 	  sm_graph.output("../test/test_guard_dsl_2.dot")
     
-    assert_equal(3 , sm.states_store.length , "Check for 3 states")
+    assert_equal(4 , sm.states_store.length , "Check for 3 states")
 
  		# Check standard length walk
  		the_walk = sm.random_walk(:HOME)
  		assert_equal(Walk.new.class ,               the_walk.class ,    "Check random walk returns Walk instance" )
+ 		
+ 		puts "&&&&&&&&&&&&&&&&&&"
+ 		puts the_walk
  		
  		# When guards are in place, walk cn only be length 3
  		assert_equal(3 ,the_walk.transitions.length , "Check Walk is length 3")

@@ -134,8 +134,15 @@ class BSM__tests < Test::Unit::TestCase
  		puts "&&&&&&&&&&&&&&&&&&"
  		puts the_walk
  		
+ 		#sm.state=:HOME
+ 		#puts "Man made walk:"
+ 		#puts sm.click_log_in
+ 		#puts sm.click_home
+ 		#puts sm.view_content
+ 		#puts sm.show_more
+ 		
  		# When guards are in place, walk cn only be length 3
- 		assert_equal(3 ,the_walk.transitions.length , "Check Walk is length 3")
+ 		assert_equal(4 ,the_walk.transitions.length , "Check Walk is length 3")
  	
  	end # end
 

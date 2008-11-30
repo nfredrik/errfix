@@ -722,7 +722,10 @@ class StateMachine
 
   		# Random walk create object to store the walk details	
   		a_walk=Walk.new(Walk::RANDOM)
+  		puts_debug "Random Walk: Setting StatemMachine start_state: #{start_state}"
   		a_walk.start_state=start_state
+  		# Set start state in self (state_machine)
+  		self.state=start_state
 
       # Call the random steps code to actually make the 'steps'
       complete_walk = random_steps(a_walk, steps_limit)
@@ -756,17 +759,69 @@ class StateMachine
         current_state = the_walk.last_added.end_state
       end
       actions = get_actions_for_state(current_state)
+  
 
+      # If a dead end (ie: no actions exist) then the walk is over.
+      # 
       if (actions.length==0)
         the_walk.end_state=current_state
         return the_walk
       else
+                
+        # Work through available actions and check if guarded and if the guard passes..
+        #
+        usable_actions=Array.new
+        actions.each_index do |action_index|
+          
+          # Check if Guarded transitions exist
+          if self.guarded_actions !=nil
+            
+            # Check if this individual action is guarded.
+            if self.guarded_actions.include? actions[action_index]
+              # Check if guard 'passes' 
+              if eval("self._guard_on_#{actions[action_index]}")
+                usable_actions.push action_index
+              else
+                # don't bother with this action, as its guard failed.
+              end # if guard passes
+            else
+              # Some actions are guarded, but this one isn't...
+              usable_actions.push action_index
+            end # if is a guarded action
+            
+          else
+            # All actions are unguarded - so just compile a list of them...
+            usable_actions.push action_index
+          end # end if guarded actions if not nil
+        end # end actions
 
-        # Choose an option at random
-        choice=rand(actions.length)
-        next_state = self.adjacency_matrix[current_state][choice].end_state
-        action = self.adjacency_matrix[current_state][choice].action
-
+        # If a dead end (ie: has passing guards) then the walk is over.
+        # 
+        if (usable_actions.length==0)
+          the_walk.end_state=current_state
+          return the_walk
+        end # end if usable length 0
+        
+        # Choose an option/action at random, from usable actions.
+        # Usable actions contains 'actual' index of the choice.
+        #
+        choice=rand(usable_actions.length)
+        next_state = self.adjacency_matrix[current_state][usable_actions[choice]].end_state
+        action = self.adjacency_matrix[current_state][usable_actions[choice]].action
+        
+        # Hack!
+        # Ensures that methods are not called if Statemachine defined without guards (ie csv ones)
+        # While technically correct - we should really create the methods whether we are using CSV or 
+        # DSL defined StateMachines...
+        # 
+        if self.guarded_actions != nil
+        
+          # Execute the chosen action, to update the state and run actions code
+          puts "Execute Action:"
+          puts "self.#{action}"
+          eval("self.#{action}")
+        end # end if using guarded trasitions
+        
         the_walk.transitions.push TransitionHolder.new(current_state,action,next_state)
 
         # Make the next step

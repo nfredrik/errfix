@@ -29,4 +29,4 @@ $LOAD_PATH << File.expand_path(File.dirname(__FILE__) + "/../test")
 
 require 'statemodelcreator__tests'
 require 'graph__tests'
-#require 'bsm__tests'
+require 'bsm__tests'

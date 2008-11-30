@@ -274,7 +274,7 @@ class StateModelCreator__tests < Test::Unit::TestCase
 	#
 	def test_random_walk_muliple
 	  @valid_csv_files.each do |csv_file|
-  		smc = StateModelCreator.new	  
+  		smc = StateModelCreator.new(true)	  
   		sm = smc.load_table(csv_file)
   		
 	    the_walk = sm.random_walk("STATEA")
@@ -318,7 +318,8 @@ class StateModelCreator__tests < Test::Unit::TestCase
 		sm = smc.load_table(TEST5_CSV)
 		
 		the_walk = sm.random_walk("STATEA")
-
+    puts "test_random_walk_many_straight_steps"
+    puts the_walk
     # Check that the transitions are found (when only 1 choice) and ordered correctly
 	  trans = the_walk.transitions
     assert(trans[0].start_state=="STATEA" , "State A is 1st start state")

@@ -29,6 +29,24 @@ require 'errfix'
 
 class BSM__tests < Test::Unit::TestCase
 
+  # 1 Dimensional State tables
+	TEST1_CSV="test1.csv"           # Simple 2 state 2 action table
+	TEST2_1LINE_CSV="test2.csv"     # Only has 1 line
+	TEST3_0LINE_CSV="test3.csv"     # Has no lines
+	TEST4_CSV="test4.csv"           # Line with fork, UNIX format txt
+	TEST5_CSV="test5.csv"           # Several states in a row, single file
+	TEST9_CSV="test9.csv"           # Line with loop backs, DOS format txt
+  TEST10_CSV="test10.csv"         # Line with fork, DOS format txt
+  
+  # 2 Dimensional State tables
+  TEST1_2d_CSV="test1_2d.csv"           # Simple 2 state 2 action table
+	TEST2_2d_1LINE_CSV="test2_2d.csv"     # Only has 1 line
+	TEST3_2d_0LINE_CSV="test3_2d.csv"     # Has no lines
+	TEST4_2d_CSV="test4_2d.csv"           # Line with fork, UNIX format txt
+	TEST5_2d_CSV="test5_2d.csv"           # Several states in a row, single file
+	TEST9_2d_CSV="test9_2d.csv"           # Line with loop backs, DOS Format txt
+  TEST10_2d_CSV="test10_2d.csv"         # Line with fork, DOS format txt
+
 	def setup
     # no setup
 	end # end setup
@@ -77,6 +95,20 @@ class BSM__tests < Test::Unit::TestCase
  		assert_equal(true , sm._guard_on_action2 , "Check Guard returns correct value")
       
 	end # end test
+ 	
+ 	# Loaded CSV files should create methods on StateMachine.
+ 	# Just as DSL created STateMachines have.
+ 	#
+ 	def test_sm_load_table_simple
+    smc = StateModelCreator.new(true)	  
+		sm = smc.load_table(TEST1_CSV)
+		sm.state="STATEA"
+		# Check if action method is added
+		sm.action1
+		#
+		sm.action2
+ 
+  end # end def
  	
  	
  	# Define a model with guarded transitions.

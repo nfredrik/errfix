@@ -195,6 +195,22 @@ private
 		return adj_matrix
 	end # end def 
 
+  # Take the transitions stored in the adjacency matrix and use
+  # these to add actions to the state machine, as methods.
+  # Aimed for use after transitions have been loaded via csv files.
+  #
+  def update_sm_with_actions
+    puts_debug "Update StateMachine with actions:"
+    puts_debug @state_machine.adjacency_matrix
+    @state_machine.adjacency_matrix.values.each do |trans_array|
+      trans_array.each do |transition|
+        puts_debug transition.action
+        
+        define_action transition.action
+      end # each transition
+    end # each trans array 
+  end # end update_sm_with_actions
+
 public 
 
 #
@@ -211,13 +227,13 @@ public
     @states=Array.new
     @guards=Array.new
     @temp_transition_list=Array.new
-    @state_machine=StateMachine.new
+    @state_machine=StateMachine.new(self.debug)
     
 	end # end def
 
-#
-# Load the CSV file into memory
-#
+  #
+  # Load the CSV file into memory
+  #
   def load_table(csv_state_table)
     
     # Detect dimensions of state table.
@@ -226,8 +242,17 @@ public
 		# the_state_machine = StateMachine.new
 		@state_machine.adjacency_matrix= create_adjacency_matrix(read_csv_file(csv_state_table))
 		
+		puts_debug "Added Adjacency Matrix to StateMachine:"
+		puts_debug @state_machine.adjacency_matrix
+		
 		# Give the statemachine the statestore, its used in random walks etc
 		@state_machine.states_store=self.states_store
+		
+		update_sm_with_actions
+		
+		puts_debug "StateMachine has now been updated with actions, loaded from csv."
+		puts_debug "Adjacency Matrix: #{@state_machine.adjacency_matrix}"
+		puts_debug "Methods:#{@state_machine.methods.sort}"
 		
 		return @state_machine
 		
@@ -307,9 +332,9 @@ public
   end # end states
   
   def define_action(action_name)
-
+    puts_debug "Define Action: #{action_name}"
     @actions.push action_name  
-    self.state_machine.class.send(:define_method , action_name) do 
+    @state_machine.class.send(:define_method , action_name) do 
       begin
         puts_debug "Action: #{action_name}"
         yield
@@ -318,12 +343,13 @@ public
       end # end rescue
       
       # whats the new state...
-      puts_debug self.adjacency_matrix
+      puts_debug "Executing StateMachine defined method."
+      puts_debug "Adjacency Debug: #{self.adjacency_matrix}"
       
-      self.adjacency_matrix[self.state].each do |current_transition|
-        if current_transition.action==action_name          
-          self.state=current_transition.end_state          
-        end # end if
+      self.adjacency_matrix[self.state].each do |a_transition|
+          if a_transition.action==action_name          
+            self.state=a_transition.end_state          
+          end # end if a transition
       end # end each
       
       # Subtlely return the new state...

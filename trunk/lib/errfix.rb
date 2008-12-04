@@ -334,7 +334,8 @@ public
   def define_action(action_name)
     puts_debug "Define Action: #{action_name}"
     @actions.push action_name  
-    @state_machine.class.send(:define_method , action_name) do 
+    #@state_machine.class.send(:define_method , action_name) do 
+    @state_machine.define_singleton_method action_name do
       begin
         puts_debug "Action: #{action_name}"
         yield
@@ -566,6 +567,12 @@ class StateMachine
     self.debug=debug_val
     @guard_temp
   end # end init
+  
+  def define_singleton_method name, &body
+    singleton_class = class << self; self; end
+    singleton_class.send(:define_method, name, &body)
+  end
+  
   
   attr_accessor(:adjacency_matrix,:states_store,:the_dot_graph, :state, :debug, :guarded_actions)
   

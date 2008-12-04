@@ -110,6 +110,32 @@ class BSM__tests < Test::Unit::TestCase
  
   end # end def
  	
+ 	# Does using two instances of the state_machine cause cross deployment of methods
+ 	#
+ 	def test_concurrent_use
+ 	  
+    smc1 = StateModelCreator.new(true)
+ 		smc1.define_action :a1
+ 		smc1.define_action :b1
+ 		smc1.attach_transition(:STATEA,:a1,:STATEB)
+ 		smc1.attach_transition(:STATEB,:b1,:STATEA)
+ 	  sm1 = smc1.state_machine
+ 	  sm1.state=:STATEA
+ 	  
+    smc2 = StateModelCreator.new(true)
+ 		smc2.define_action :a2
+ 		smc2.define_action :b2
+ 		smc2.attach_transition(:STATEA,:a2,:STATEB)
+ 		smc2.attach_transition(:STATEB,:b2,:STATEA)
+ 	  sm2 = smc2.state_machine	  
+ 	  sm2.state=:STATEA
+ 	  
+ 	  assert_raises NoMethodError , "Check actions/methods are only added to one instance." do
+ 	    sm2.a1
+    end # end assert raises
+ 	  
+ 	  
+  end  # end test
  	
  	# Define a model with guarded transitions.
  	# Check it is correctly navigated,

@@ -168,7 +168,10 @@ private
 		return state_transition_list
   end # end method
 
-
+  # Takes a list of transition objects and returns an adjacency matrix.
+  # The Adjacency matrix is a Hash object, keyed by State, with the values being an Array of
+  # Transition objects accessible from that State.
+  #
 	def create_adjacency_matrix(raw_state_transition_list)
 
 		adj_matrix=Hash.new
@@ -296,11 +299,15 @@ public
   
   end # end method
 
- 
+  # Return Array of action names.
+  #
   def actions
     return @actions
   end # end actions
   
+  # Return StateMachine class instance.
+  # The returned object will contain all the added actions and guards.
+  #
   def state_machine
     # Give the statemachine the statestore, its used in random walks etc
     @state_machine.adjacency_matrix=create_adjacency_matrix(@temp_transition_list)
@@ -331,6 +338,14 @@ public
     return @states.uniq
   end # end states
   
+  # Add an action to the State Machine.
+  # These Actions are methods on the state machine.
+  # As well as Action name, an optional code block can be passed.
+  # This is executed when that method is called.e.g.
+  # my_state_machine#my_action => my_new_state
+  # Will execute the optional code block.
+  # The defined method returns the new State, when its called.
+  # 
   def define_action(action_name)
     puts_debug "Define Action: #{action_name}"
     @actions.push action_name  
@@ -360,6 +375,11 @@ public
     
   end # end add action
 
+  # Define guard on an Action [that has been previously defined]
+  # A guard is a trigger on the action. The guard must return true for the
+  # action to be executed, and the state machine be allowed to reach its new state.
+  # Guards allow the creation of EFSMs
+  #
   def define_guard_on(action_name)
     @guards.push action_name  
      self.state_machine.class.send(:define_method , "_guard_on_#{action_name.to_s}") do 
@@ -847,13 +867,13 @@ class StateMachine
         # While technically correct - we should really create the methods whether we are using CSV or 
         # DSL defined StateMachines...
         # 
-        if self.guarded_actions != nil
+      #  if self.guarded_actions != nil
         
           # Execute the chosen action, to update the state and run actions code
-          puts "Execute Action:"
-          puts "self.#{action}"
+          puts_debug "Execute Action:"
+          puts_debug "self.#{action}"
           eval("self.#{action}")
-        end # end if using guarded trasitions
+     #   end # end if using guarded trasitions
         
         the_walk.transitions.push TransitionHolder.new(current_state,action,next_state)
 

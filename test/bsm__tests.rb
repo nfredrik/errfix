@@ -137,12 +137,8 @@ class BSM__tests < Test::Unit::TestCase
  	  
   end  # end test
  	
- 	# Define a model with guarded transitions.
- 	# Check it is correctly navigated,
- 	#
- 	def test_random_walk_guarded_complex_dsl
- 	  
- 		smc = StateModelCreator.new(true)
+ 	def a_guarded_state_machine
+ 	  smc = StateModelCreator.new(true)
  		smc.define_action :click_home
  		smc.define_action :view_content
 
@@ -177,34 +173,52 @@ class BSM__tests < Test::Unit::TestCase
  		smc.attach_transition(:HOME,:click_log_in,:LOG_IN_COMPLETE)
  		smc.attach_transition(:LOG_IN_COMPLETE,:click_home,:HOME)
  		
- 		sm = smc.state_machine
+ 		#smc = smc.state_machine
  		
+ 		return smc
+  
+  end # procedure for creating a state machine
+ 	
+ 	# Define a model with guarded transitions.
+ 	# Check it is correctly navigated,
+ 	#
+ 	def test_random_walk_guarded_complex_dsl
+ 	  smc = a_guarded_state_machine
+ 	  sm = smc.state_machine
+ 	  
     # Create the Graphiz graph object, see if it fails...
 	  sm_graph = sm.create_dot_graph	
 	  sm_graph.output("../test/test_guard_dsl_2.dot")
     
-    assert_equal(4 , sm.states_store.length , "Check for 3 states")
+    assert_equal(4 , sm.states_store.length , "Check for 4 states")
 
- 		# Check standard length walk
+ 		# Check creates a real walk
  		the_walk = sm.random_walk(:HOME)
- 		assert_equal(Walk.new.class ,               the_walk.class ,    "Check random walk returns Walk instance" )
+ 		assert_equal(Walk.new.class, the_walk.class , "Check random walk returns Walk instance" )
  		
- 		puts "&&&&&&&&&&&&&&&&&&"
+ 		puts "test_random_walk_guarded_complex_dsl"
  		puts the_walk
  		
- 		#sm.state=:HOME
- 		#puts "Man made walk:"
- 		#puts sm.click_log_in
- 		#puts sm.click_home
- 		#puts sm.view_content
- 		#puts sm.show_more
- 		
- 		# When guards are in place, walk cn only be length 3
- 		assert_equal(4 ,the_walk.transitions.length , "Check Walk is length 3")
+ 		# When guards are in place, walk can only be length 4
+ 		assert_equal(4 ,the_walk.transitions.length , "Check Walk is length 4")
  	
  	end # end
 
+  # Test that Statemachine variables (from custom methods) can be read.
+  def test_read_action_variables
+    smc = a_guarded_state_machine
+    
+    smc.define_reader :logged_in do;  @logged_in ;end
+    sm = smc.state_machine
+    sm.state=:HOME
+    sm.click_log_in
+    assert_equal(:LOG_IN_COMPLETE, sm.state , "Check Logged in.")
+    puts
+    puts "Variables:"
+    puts sm.read_logged_in
+    assert(sm.read_logged_in , "Check logged in is accessible and true")
 
+  end # test can read variabled created in action methods
   
 	def teardown
 	end # end teardown/clearup

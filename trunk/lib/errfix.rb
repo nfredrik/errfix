@@ -383,7 +383,9 @@ public
   #
   def define_guard_on(action_name)
     @guards.push action_name  
-     self.state_machine.class.send(:define_method , "_guard_on_#{action_name.to_s}") do 
+     #self.state_machine.class.send(:define_method , "_guard_on_#{action_name.to_s}") do 
+    @state_machine.define_singleton_method "_guard_on_#{action_name.to_s}"  do 
+
        begin
          puts_debug "Guard on: #{action_name}"
          return yield
@@ -597,11 +599,7 @@ class StateMachine
     @guard_temp
   end # end init
   
-  def define_singleton_method name, &body
-    singleton_class = class << self; self; end
-    singleton_class.send(:define_method, name, &body)
-  end
-  
+
   
   attr_accessor(:adjacency_matrix,:states_store,:the_dot_graph, :state, :debug, :guarded_actions)
   
@@ -612,6 +610,95 @@ class StateMachine
         puts msg
       end # end debug
     end # end msg
+
+      def random_steps(the_walk, steps_limit)
+        if (the_walk.length >= steps_limit)
+          return the_walk
+        else 
+
+        # Get the 'current' state of the walk
+        if (the_walk.length == 0)
+          # If just started then its the start state
+          current_state = the_walk.start_state
+        else
+          # Otherwise its the the end state of the last transition
+          current_state = the_walk.last_added.end_state
+        end
+        actions = get_actions_for_state(current_state)
+
+
+        # If a dead end (ie: no actions exist) then the walk is over.
+        # 
+        if (actions.length==0)
+          the_walk.end_state=current_state
+          return the_walk
+        else
+
+          # Work through available actions and check if guarded and if the guard passes..
+          #
+          usable_actions=Array.new
+          actions.each_index do |action_index|
+
+            # Check if Guarded transitions exist
+            if self.guarded_actions !=nil
+
+              # Check if this individual action is guarded.
+              if self.guarded_actions.include? actions[action_index]
+                # Check if guard 'passes' 
+                if eval("self._guard_on_#{actions[action_index]}")
+                  usable_actions.push action_index
+                else
+                  # don't bother with this action, as its guard failed.
+                end # if guard passes
+              else
+                # Some actions are guarded, but this one isn't...
+                usable_actions.push action_index
+              end # if is a guarded action
+
+            else
+              # All actions are unguarded - so just compile a list of them...
+              usable_actions.push action_index
+            end # end if guarded actions if not nil
+          end # end actions
+
+          # If a dead end (ie: has passing guards) then the walk is over.
+          # 
+          if (usable_actions.length==0)
+            the_walk.end_state=current_state
+            return the_walk
+          end # end if usable length 0
+
+          # Choose an option/action at random, from usable actions.
+          # Usable actions contains 'actual' index of the choice.
+          #
+          choice=rand(usable_actions.length)
+          next_state = self.adjacency_matrix[current_state][usable_actions[choice]].end_state
+          action = self.adjacency_matrix[current_state][usable_actions[choice]].action
+
+            # Execute the chosen action, to update the state and run actions code
+            puts_debug "Execute Action:"
+            puts_debug "self.#{action}"
+            eval("self.#{action}")
+
+          the_walk.transitions.push TransitionHolder.new(current_state,action,next_state)
+
+          # Make the next step
+          random_steps(the_walk,steps_limit)
+
+    		end # end actions
+      end # else
+    end # end method steps
+
+
+
+
+public
+
+  # Add a method (action) to this classes - instances, singleton class
+  def define_singleton_method name, &body
+    singleton_class = class << self; self; end
+    singleton_class.send(:define_method, name, &body)
+  end
 
   #
   # List on standard out each state and the actions associated with it
@@ -735,9 +822,6 @@ class StateMachine
 
     end # end method
 
-  
-
-
     # Find valid transitions
     # Adjacency matrix is keyed by State, and values are arrays of transitions.
     # Therefore to get Transitions you need to cull the dead-end states.
@@ -806,116 +890,6 @@ class StateMachine
 
   		return complete_walk
   	end # end def	
-
-  
-    def random_steps(the_walk, steps_limit)
-      if (the_walk.length >= steps_limit)
-        return the_walk
-      else 
-
-      # Get the 'current' state of the walk
-      if (the_walk.length == 0)
-        # If just started then its the start state
-        current_state = the_walk.start_state
-      else
-        # Otherwise its the the end state of the last transition
-        current_state = the_walk.last_added.end_state
-      end
-      actions = get_actions_for_state(current_state)
-  
-
-      # If a dead end (ie: no actions exist) then the walk is over.
-      # 
-      if (actions.length==0)
-        the_walk.end_state=current_state
-        return the_walk
-      else
-                
-        # Work through available actions and check if guarded and if the guard passes..
-        #
-        usable_actions=Array.new
-        actions.each_index do |action_index|
-          
-          # Check if Guarded transitions exist
-          if self.guarded_actions !=nil
-            
-            # Check if this individual action is guarded.
-            if self.guarded_actions.include? actions[action_index]
-              # Check if guard 'passes' 
-              if eval("self._guard_on_#{actions[action_index]}")
-                usable_actions.push action_index
-              else
-                # don't bother with this action, as its guard failed.
-              end # if guard passes
-            else
-              # Some actions are guarded, but this one isn't...
-              usable_actions.push action_index
-            end # if is a guarded action
-            
-          else
-            # All actions are unguarded - so just compile a list of them...
-            usable_actions.push action_index
-          end # end if guarded actions if not nil
-        end # end actions
-
-        # If a dead end (ie: has passing guards) then the walk is over.
-        # 
-        if (usable_actions.length==0)
-          the_walk.end_state=current_state
-          return the_walk
-        end # end if usable length 0
-        
-        # Choose an option/action at random, from usable actions.
-        # Usable actions contains 'actual' index of the choice.
-        #
-        choice=rand(usable_actions.length)
-        next_state = self.adjacency_matrix[current_state][usable_actions[choice]].end_state
-        action = self.adjacency_matrix[current_state][usable_actions[choice]].action
-        
-          # Execute the chosen action, to update the state and run actions code
-          puts_debug "Execute Action:"
-          puts_debug "self.#{action}"
-          eval("self.#{action}")
-        
-        the_walk.transitions.push TransitionHolder.new(current_state,action,next_state)
-
-        # Make the next step
-        random_steps(the_walk,steps_limit)
-
-  		end # end actions
-    end # else
-  end # end method steps
-
-  def instance
-    singleton_class = class << self; self; end
-    return singleton_class
-  end # end return instance
-
-#def variable &block
-  
-
- #  self._variable &block
-#end # end 
-
-
- # def variable &block
-  #  self.define_singleton_method "_variable" do
-       # puts "_variable"
-      #  puts "@#{variable_name}"
-       # puts eval("@#{variable_name}")
-        # Return the variable...
-        #eval("@#{variable_name}")
-   #     yield &block
-    # end # end proc
-     #self._variable &block
-    #def singleton_class.variable(variable_name)
-     #eval("@#{variable_name}")
-    #end #
-    #self.instance_variables
-  #end # end variable
-
-
-  #private
   
    
 end # end class

@@ -220,11 +220,20 @@ class StateModelCreator__tests < Test::Unit::TestCase
   # Creates dot graph (GraphViz) and then checks that it can be written out.
   # This helps to ensure its a kosher graphviz object.
   #
-  
   def build_dsl_10
     smc =StateModelCreator.new
-     smc.define_action :action1
+     smc.define_action :action1 do 
+       @action1_done=true
+     end # end action
      smc.define_action :action2
+     smc.define_guard_on :action2 do
+       if @action1_done
+         guard=true
+       else
+         guard=false
+       end # end if
+       guard
+     end # end guard
      smc.define_action :action3
      smc.define_action :action4
      smc.attach_transition(:STATEA,:action1,:STATEB)
@@ -238,6 +247,7 @@ class StateModelCreator__tests < Test::Unit::TestCase
   def test_create_dot_graph_dsl
     sm = build_dsl_10
 	  sm_graph = sm.create_dot_graph	
+	  assert(sm_graph.to_s.scan(/Guard\//).length==1 , "Check That a Guard has been added")
 	  sm_graph.output("test10_dsl.dot")
 	  assert(File.exist?("test10_dsl.dot"),"Check the graph file: test10_dsl.dot was written out.")
 	

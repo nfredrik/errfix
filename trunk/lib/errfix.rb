@@ -308,7 +308,8 @@ public
   # Return StateMachine class instance.
   # The returned object will contain all the added actions and guards.
   #
-  def state_machine
+  def state_machine    
+    
     # Give the statemachine the statestore, its used in random walks etc
     @state_machine.adjacency_matrix=create_adjacency_matrix(@temp_transition_list)
     @state_machine.states_store=self.states_store
@@ -392,6 +393,14 @@ public
      end # end proc
     
   end # end define guard
+
+  def define_reader(variable_name)
+    puts_debug "Creating method named: read_#{variable_name}"
+    @state_machine.define_singleton_method "read_#{variable_name}" do
+         return yield
+    end # end proc
+  
+  end # end method
 
 	
 end # class
@@ -728,10 +737,11 @@ class StateMachine
 
   
 
+
+    # Find valid transitions
+    # Adjacency matrix is keyed by State, and values are arrays of transitions.
+    # Therefore to get Transitions you need to cull the dead-end states.
     def extract_valid_transitions
-      # Find valid transitions
-      # Adjacency matrix is keyed by State, and values are arrays of transitions.
-      # Therefore to get Transitions you need to cull the dead-end states.
       transitions_in_model=Array.new
   		self.adjacency_matrix.each_key do |a_state|
 			  if self.adjacency_matrix[a_state].length == 0
@@ -746,16 +756,16 @@ class StateMachine
       return transitions_in_model
     end # extract valid transitions
 
-#  call-seq:
-#     statemodel.random_walk("START_STATE") -> Walk
-#
-# Create a random walk over the model, starting at START_STATE
-#
-# Returns a Walk object containing each transition off the random walk.
-# Walk objects can then be used to 'drive' your System Under Test or framework driver code.
-# 
-# By default the walk will have a length of MAX_STEPS unless a dead end is reached first.
-# This can be overridden by passing a second Integer argument.
+    #  call-seq:
+    #     statemodel.random_walk("START_STATE") -> Walk
+    #
+    # Create a random walk over the model, starting at START_STATE
+    #
+    # =>  Returns a Walk object containing each transition off the random walk.
+    # Walk objects can then be used to 'drive' your System Under Test or framework driver code.
+    # 
+    # By default the walk will have a length of MAX_STEPS unless a dead end is reached first.
+    # This can be overridden by passing a second Integer argument.
     def random_walk(start_state, steps_limit=MAX_STEPS)
 
       # Check Start State exists in model etc
@@ -862,18 +872,10 @@ class StateMachine
         next_state = self.adjacency_matrix[current_state][usable_actions[choice]].end_state
         action = self.adjacency_matrix[current_state][usable_actions[choice]].action
         
-        # Hack!
-        # Ensures that methods are not called if Statemachine defined without guards (ie csv ones)
-        # While technically correct - we should really create the methods whether we are using CSV or 
-        # DSL defined StateMachines...
-        # 
-      #  if self.guarded_actions != nil
-        
           # Execute the chosen action, to update the state and run actions code
           puts_debug "Execute Action:"
           puts_debug "self.#{action}"
           eval("self.#{action}")
-     #   end # end if using guarded trasitions
         
         the_walk.transitions.push TransitionHolder.new(current_state,action,next_state)
 
@@ -883,6 +885,34 @@ class StateMachine
   		end # end actions
     end # else
   end # end method steps
+
+  def instance
+    singleton_class = class << self; self; end
+    return singleton_class
+  end # end return instance
+
+#def variable &block
+  
+
+ #  self._variable &block
+#end # end 
+
+
+ # def variable &block
+  #  self.define_singleton_method "_variable" do
+       # puts "_variable"
+      #  puts "@#{variable_name}"
+       # puts eval("@#{variable_name}")
+        # Return the variable...
+        #eval("@#{variable_name}")
+   #     yield &block
+    # end # end proc
+     #self._variable &block
+    #def singleton_class.variable(variable_name)
+     #eval("@#{variable_name}")
+    #end #
+    #self.instance_variables
+  #end # end variable
 
 
   #private

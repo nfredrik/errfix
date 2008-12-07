@@ -551,7 +551,7 @@ class Graph
   
   # add edge accepts 3 arguments From_node, Too_node and label
   def add_edge(*edge_details)
-    if (edge_details.length !=3)
+    if (edge_details.length <3)||(edge_details.length>4)
       raise "Error: Incorrect number of arguments in add_edge"
     end # end if length
     @edges.push edge_details
@@ -565,7 +565,17 @@ class Graph
     txt = "#{self.type} #{self.name} {\n"
     txt << "  node [shape = #{self.node_style}];\n"
     @edges.each do |edge|
-      txt << "  #{edge[0]} -> #{edge[1]} [ label = \"#{edge[2]}\" ];\n"
+      if edge.length==3
+        txt << "  #{edge[0]} -> #{edge[1]} [ label = \"#{edge[2]}\" ];\n"
+      else
+        if edge[3]==true
+          txt << "  #{edge[0]} -> #{edge[1]} [ label = \" Guard/#{edge[2]}\" ];\n"
+        else
+          txt << "  #{edge[0]} -> #{edge[1]} [ label = \"#{edge[2]}\" ];\n"
+          
+          # Guarded methods are available, but this one isn't guarded.
+        end #  end edge3
+      end # end if guarded
     end # nodes
     txt << "}\n"
     
@@ -752,7 +762,12 @@ class StateMachine
     	self.adjacency_matrix.each_key do |table_key|
     		transition_list=self.adjacency_matrix[table_key]
     		transition_list.each do |transition|
-    			my_graph.add_edge(transition.start_state , transition.end_state , " #{transition.action} ")
+    		  # is the action guarded?
+    		  if self.guarded_actions !=nil
+    		    guarded=self.guarded_actions.include? transition.action
+    			end # end if 
+    			# add the edge...
+    			my_graph.add_edge(transition.start_state, transition.end_state, " #{transition.action} ", guarded)
     		end # end add transitions
     	end # end add nodes
 

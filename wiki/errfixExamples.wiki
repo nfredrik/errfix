@@ -4,7 +4,7 @@
  
 ----
 
-== Example: A Simple _Random_ Walk ==
+== Example: A Simple _Random_ Walk using a CSV defined model==
 
 This example script creates a model and outputs a text description of a random walk. (It doesn't run any tests.)
 
@@ -30,8 +30,9 @@ The example errfix Google Searches code is:
 require 'rubygems'
 require 'errfix'
 
-# Create model,Load in the CSV file with our Google Searches model
-google_searches = StateModelCreator.new.load_table 'google_searches.csv'
+# Create model, Load in the CSV file with our Google Searches model
+smc.StateModelCreator.new
+google_searches = smc.load_table 'google_searches.csv'
 
 # Write the model's graph to the filesystem (PostScript format)
 google_searches.create_dot_graph.output("google_searches.dot")

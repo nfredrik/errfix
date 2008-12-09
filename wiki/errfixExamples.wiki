@@ -31,7 +31,7 @@ require 'rubygems'
 require 'errfix'
 
 # Create model, Load in the CSV file with our Google Searches model
-smc.StateModelCreator.new
+smc=StateModelCreator.new
 google_searches = smc.load_table 'google_searches.csv'
 
 # Write the model's graph to the filesystem (PostScript format)

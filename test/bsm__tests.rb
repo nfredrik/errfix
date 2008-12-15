@@ -110,6 +110,25 @@ class BSM__tests < Test::Unit::TestCase
  
   end # end def
  	
+ 	# Loaded CSV files should create methods on StateMachine.
+ 	# Check No Method Error raised when action called on wrong state
+ 	#
+ 	def test_sm_no_method_error
+    smc = StateModelCreator.new(true)	  
+		sm = smc.load_table(TEST1_CSV)
+		sm.state="STATEA"
+		
+		# Check error raised
+		assert_raises NoMethodError do
+		  sm.action2
+	  end # raises
+	  sm.action1
+		assert_raises NoMethodError do
+		  sm.action1
+    end # raises
+  end # end def 	
+ 	
+ 	
  	# Does using two instances of the state_machine cause cross deployment of methods
  	#
  	def test_concurrent_use

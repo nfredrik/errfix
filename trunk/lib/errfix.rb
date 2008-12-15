@@ -236,6 +236,8 @@ public
   #
   # Load the CSV file into memory
   #
+  # Returns an instance of StateMachine
+  # 
   def load_table(csv_state_table)
     
     # Detect dimensions of state table.
@@ -350,26 +352,29 @@ public
     @actions.push action_name  
     #@state_machine.class.send(:define_method , action_name) do 
     @state_machine.define_singleton_method action_name do
-      begin
-        puts_debug "Action: #{action_name}"
-        yield
-      rescue LocalJumpError 
-        # ignore, this is just a plain action.
-      end # end rescue
+      if self.get_actions_for_state(self.state).include?(action_name)
+        begin
+          puts_debug "Action: #{action_name}"
+          yield
+        rescue LocalJumpError 
+          # ignore, this is just a plain action.
+        end # end rescue
       
-      # whats the new state...
-      puts_debug "Executing StateMachine defined method."
-      puts_debug "Adjacency Debug: #{self.adjacency_matrix}"
+        # whats the new state...
+        puts_debug "Executing StateMachine defined method."
+        puts_debug "Adjacency Debug: #{self.adjacency_matrix}"
       
-      self.adjacency_matrix[self.state].each do |a_transition|
+        self.adjacency_matrix[self.state].each do |a_transition|
           if a_transition.action==action_name          
             self.state=a_transition.end_state          
           end # end if a transition
-      end # end each
+        end # end each
       
-      # Subtlely return the new state...
-      self.state
-      
+        # Subtlely return the new state...
+        self.state
+      else
+        raise NoMethodError
+      end # end if action exists
     end # end proc
     
   end # end add action

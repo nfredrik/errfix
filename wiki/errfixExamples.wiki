@@ -8,7 +8,7 @@
 
 ----
 
-=== Example 1 : Random Walk using a CSV defined model (Google Homepages Example)===
+=== Example 1: Random Walk using a CSV defined model (Google Homepages Example)===
 
 
 This example script creates a model and outputs a text description of a random walk. (It doesn't run any tests.)

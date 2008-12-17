@@ -89,7 +89,76 @@ http://sites.google.com/site/exploretesting/Home/google_searches.png
 
 ----
 
+== Example: A Random Walk Driving a (Fake) System Under Test==
 
+Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
+
+==== The code: ====
+
+First lets print out the coverage statistics for this walk:
+
+{{{
+puts "State Coverage: #{google_walk_1.state_coverage}"
+puts "Transition Coverage: #{google_walk_1.transition_coverage}"
+}}}
+
+Now lets create a simple System Under Test (SUT). This could be a class you are testing, but also a driver to the SUT. Typically this driver would direct your test tool, Selenium RC or WATiR.
+{{{
+class SystemUnderTestDriver
+  # Action Methods that errfix will look for...
+  def click_web;      puts "action: click_web"; end # end method
+  def click_images;   puts "action: click_images"; end # end method
+  def click_maps;     puts "action: click_maps"; end # end method
+  def click_shopping; puts "action: click_shopping"; end # end method
+  def click_mail;     puts "action: click_mail"; end # end method
+  # Include these methods to verify state of the SUT
+  def test_WEB;       puts "testing: WEB"; end # end method
+  def test_IMAGES;    puts "testing: IMAGES"; end # end method
+  def test_MAPS;      puts "testing: MAPS"; end # end method
+  def test_SHOPPING;  puts "testing: SHOPPING"; end # end method
+  def test_MAIL;      puts "testing: MAIL"; end # end method  
+end # class under test
+}}}
+
+The above driver code would be required normally, even when not using errfix. We've created it here to allow you to see how errfix might interact with your system.
+
+errfix can now easily drive through your model, along the path of the Random Walk. errfix will call methods with the same name as your actions (in the CSV file). It will also call a method called test_STATE-NAME after each action. These 'test_' methods can be used to execute tests, ensuring your SUT has correctly reached a new State.
+
+{{{
+google_walk_1.drive_using(SystemUnderTestDriver.new)
+}}}
+
+You can download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg_2.rb the code here].
+
+====How to run the code:====
+Place the above file (and the CSV file mentioned above) in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
+{{{
+ruby errfix_google_eg_2.rb
+}}}
+
+The output will look something like this:
+
+{{{
+State Coverage: 100.0
+Transition Coverage: 64.7058823529412
+
+Lets get our Random Walk to drive our SUT or at least our SUT driver code...
+testing: WEB
+action: click_images
+testing: IMAGES
+action: click_mail
+testing: MAIL
+action: click_web
+testing: WEB
+action: click_maps
+testing: MAPS
+action: click_web
+testing: WEB
+...
+}}}
+
+
+----
 ===Example: Guarded actions using the  errfix DSL (Foobar Media EFSM Example)===
 
 
@@ -173,71 +242,3 @@ MORE_CONTENT
 You can [http://sites.google.com/site/exploretesting/Home/errfix_dsl_example.rb?attredirects=0 download this code in full].
 
 ----
-
-== Example: A Random Walk Driving a (Fake) System Under Test==
-
-Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
-
-==== The code: ====
-
-First lets print out the coverage statistics for this walk:
-
-{{{
-puts "State Coverage: #{google_walk_1.state_coverage}"
-puts "Transition Coverage: #{google_walk_1.transition_coverage}"
-}}}
-
-Now lets create a simple System Under Test (SUT). This could be a class you are testing, but also a driver to the SUT. Typically this driver would direct your test tool, Selenium RC or WATiR.
-{{{
-class SystemUnderTestDriver
-  # Action Methods that errfix will look for...
-  def click_web;      puts "action: click_web"; end # end method
-  def click_images;   puts "action: click_images"; end # end method
-  def click_maps;     puts "action: click_maps"; end # end method
-  def click_shopping; puts "action: click_shopping"; end # end method
-  def click_mail;     puts "action: click_mail"; end # end method
-  # Include these methods to verify state of the SUT
-  def test_WEB;       puts "testing: WEB"; end # end method
-  def test_IMAGES;    puts "testing: IMAGES"; end # end method
-  def test_MAPS;      puts "testing: MAPS"; end # end method
-  def test_SHOPPING;  puts "testing: SHOPPING"; end # end method
-  def test_MAIL;      puts "testing: MAIL"; end # end method  
-end # class under test
-}}}
-
-The above driver code would be required normally, even when not using errfix. We've created it here to allow you to see how errfix might interact with your system.
-
-errfix can now easily drive through your model, along the path of the Random Walk. errfix will call methods with the same name as your actions (in the CSV file). It will also call a method called test_STATE-NAME after each action. These 'test_' methods can be used to execute tests, ensuring your SUT has correctly reached a new State.
-
-{{{
-google_walk_1.drive_using(SystemUnderTestDriver.new)
-}}}
-
-You can download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg_2.rb the code here].
-
-====How to run the code:====
-Place the above file (and the CSV file mentioned above) in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
-{{{
-ruby errfix_google_eg_2.rb
-}}}
-
-The output will look something like this:
-
-{{{
-State Coverage: 100.0
-Transition Coverage: 64.7058823529412
-
-Lets get our Random Walk to drive our SUT or at least our SUT driver code...
-testing: WEB
-action: click_images
-testing: IMAGES
-action: click_mail
-testing: MAIL
-action: click_web
-testing: WEB
-action: click_maps
-testing: MAPS
-action: click_web
-testing: WEB
-...
-}}}

@@ -89,6 +89,89 @@ http://sites.google.com/site/exploretesting/Home/google_searches.png
 
 ----
 
+===Example: errfix DSL===
+
+Our hypothetical media organisation _FooBar Media Intl_, wants to model its online media system. Like all good companies they are developing iteratively. (At least thats there reason for only having two pieces of content). An errfix generated graph can be seen here:
+
+[http://sites.google.com/site/exploretesting/Home/test_guard_dsl_2.gif?attredirects=0] 
+
+The above graph is created automatically in [http://en.wikipedia.org/wiki/DOT_language DOT] format, by errfix.
+
+The code below first defines all the 'Actions'. One of the actions ':click_log_in' sets a variable '@logged_in' to _true_:
+
+{{{
+require 'rubygems'
+require 'errfix'
+
+# Create a FSM and draw a graph
+#
+smc = StateModelCreator.new
+
+# The Actions...
+smc.define_action :click_home
+smc.define_action :view_content
+smc.define_action :show_more
+smc.define_action :click_log_in do
+  @logged_in=true
+end # end action
+}}}
+
+We then define 'Guards', these stop the actions from being _actioned_ or completed unless the conditions have been met:
+{{{
+# The Guards...
+smc.define_guard_on :view_content do
+  # You can only view content if you are logged in.
+  if @logged_in
+    guard=true
+  else
+    guard=false
+  end # end if else
+  guard
+end # end guard
+
+smc.define_guard_on :click_log_in do
+  # You can't log in if you are already logged in.
+  if @logged_in
+    guard=false
+  else
+    guard=true
+  end # end if else
+  guard
+end # end guard
+}}}
+
+Now we just need to state where these Actions (and their Guards), will be used.
+For this we attach the transition, naming the start and end states as well as what action connects them:
+{{{
+smc.attach_transition(:HOME,:view_content,:SHOWING_CONTENT)
+smc.attach_transition(:SHOWING_CONTENT,:show_more,:MORE_CONTENT)
+smc.attach_transition(:HOME,:click_log_in,:LOG_IN_COMPLETE)
+smc.attach_transition(:LOG_IN_COMPLETE,:click_home,:HOME)
+
+my_efsm = smc..state_machine
+my_efsm.create_dot_graph.output("my_fsm_graph.dot")
+}}}
+
+Finally, above, we get a copy of the completed State Machine and then output the graph in DOT format.
+
+What if I want to output a random walk across this model? 
+
+{{{
+puts my_efsm.random_walk(:HOME)
+}}}
+
+Well thanks to the guards, a walk starting at :HOME can only take one path.:
+HOME,
+click_log_in => LOG_IN_COMPLETE,
+click_home => HOME,
+view_content => SHOWING_CONTENT,
+show_more => MORE_CONTENT,
+MORE_CONTENT
+
+You can [http://sites.google.com/site/exploretesting/Home/errfix_dsl_example.rb?attredirects=0 download this code in full].
+
+----
+
 == Example: A Random Walk Driving a (Fake) System Under Test==
 
 Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.

@@ -66,7 +66,7 @@ end # end the walk
 You can download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg.rb errfix_google_eg.rb here].
 
 
-====How to run the code:====
+====How to run the code====
 
 
 Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:

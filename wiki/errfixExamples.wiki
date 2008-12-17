@@ -19,7 +19,7 @@
 This example script creates a model and outputs a text description of a random walk. (It doesn't run any tests.)
 
 
-==== The data: ====
+==== CSV data ====
 
 
 The CSV file contents should be:
@@ -34,7 +34,7 @@ The CSV file contents should be:
 You can download this CSV [http://sites.google.com/site/exploretesting/Home/google_searches.csv file here].
 
 
-==== The code: ====
+==== Source Code: ====
 
 
 The example errfix Google Searches code is:
@@ -114,7 +114,7 @@ http://sites.google.com/site/exploretesting/Home/google_searches.png
 Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
 
 
-==== The code: ====
+==== Source Code: ====
 
 
 First lets print out the coverage statistics for this walk:
@@ -194,6 +194,10 @@ Our hypothetical media organisation _FooBar Media Intl_, wants to model its onli
 [http://sites.google.com/site/exploretesting/Home/test_guard_dsl_2.gif?attredirects=0] 
 
 The above graph is created automatically in [http://en.wikipedia.org/wiki/DOT_language DOT] format, by errfix.
+
+
+====Source Code====
+
 
 The code below first defines all the 'Actions'. One of the actions ':click_log_in' sets a variable '@logged_in' to _true_:
 

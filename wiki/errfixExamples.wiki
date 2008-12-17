@@ -3,9 +3,9 @@
 *errfix* creates a software model of your system, from a simple CSV file or using its built in API. errfix lets you create _Random Walks_ across your model, moving from State to State by executing actions.
  
 
-#'Example 1' 
-#'Example 1'
-#'Example 1'
+ #Example 1 
+ #Example 1
+ #Example 1
 
 
 ----
@@ -269,4 +269,3 @@ You can [http://sites.google.com/site/exploretesting/Home/errfix_dsl_example.rb?
 
 
 ----
-

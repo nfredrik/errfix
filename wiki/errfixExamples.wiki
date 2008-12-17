@@ -114,7 +114,7 @@ http://sites.google.com/site/exploretesting/Home/google_searches.png
 Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
 
 
-==== Source Code: ====
+==== Source Code ====
 
 
 First lets print out the coverage statistics for this walk:

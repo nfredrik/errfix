@@ -89,7 +89,7 @@ http://sites.google.com/site/exploretesting/Home/google_searches.png
 
 ----
 
-== Example: A Random Walk Driving a (Fake) System Under Test==
+== Example: A _Random_ Walk Driving a (Fake) System Under Test (Google Homepages Test Driver Example)==
 
 Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
 

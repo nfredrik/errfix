@@ -4,7 +4,7 @@
  
 ----
 
-== Example: A Simple _Random_ Walk using a CSV defined model==
+=== Example: A Simple _Random_ Walk using a CSV defined model===
 
 This example script creates a model and outputs a text description of a random walk. (It doesn't run any tests.)
 
@@ -89,7 +89,9 @@ http://sites.google.com/site/exploretesting/Home/google_searches.png
 
 ----
 
-===Example: errfix DSL===
+
+===Example: errfix DSL extended model===
+
 
 Our hypothetical media organisation _FooBar Media Intl_, wants to model its online media system. Like all good companies they are developing iteratively. (At least thats there reason for only having two pieces of content). An errfix generated graph can be seen here:
 

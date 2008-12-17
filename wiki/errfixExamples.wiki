@@ -3,7 +3,8 @@
 *errfix* creates a software model of your system, from a simple CSV file or using its built in API. errfix lets you create _Random Walks_ across your model, moving from State to State by executing actions.
  
 
- <wiki:toc max_depth="1" />
+ <wiki:toc max_depth="3" />
+
 
 ----
 

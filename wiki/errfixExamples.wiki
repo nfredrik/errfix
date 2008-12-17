@@ -34,7 +34,7 @@ The CSV file contents should be:
 You can download this CSV [http://sites.google.com/site/exploretesting/Home/google_searches.csv file here].
 
 
-==== Source Code: ====
+==== Source Code ====
 
 
 The example errfix Google Searches code is:

@@ -3,17 +3,23 @@
 *errfix* creates a software model of your system, from a simple CSV file or using its built in API. errfix lets you create _Random Walks_ across your model, moving from State to State by executing actions.
  
 
-*Example 1 
-*Example 1
-*Example 1
+#'Example 1' 
+#'Example 1'
+#'Example 1'
+
+
 ----
 
+
 === Example 1: _Random_ Walk using a CSV defined model (Google Homepages Example)===
+
 
 This example script creates a model and outputs a text description of a random walk. (It doesn't run any tests.)
 
 
 ==== The data: ====
+
+
 The CSV file contents should be:
 
 ||Start/End||WEB||IMAGES||MAPS||SHOPPING||MAIL||
@@ -25,7 +31,11 @@ The CSV file contents should be:
 
 You can download this CSV [http://sites.google.com/site/exploretesting/Home/google_searches.csv file here].
 
+
+
 ==== The code: ====
+
+
 The example errfix Google Searches code is:
 
 {{{
@@ -54,7 +64,10 @@ end # end the walk
 
 You can download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg.rb errfix_google_eg.rb here].
 
+
 ====How to run the code:====
+
+
 Place the above 2 files in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
 {{{
 ruby errfix_google_eg.rb
@@ -93,11 +106,15 @@ http://sites.google.com/site/exploretesting/Home/google_searches.png
 
 ----
 
+
 == Example 2: A _Random_ Walk Driving a (Fake) System Under Test (Google Homepages Test Driver Example)==
+
 
 Once you have created a random walk, you can the use this walk to drive your test system using the Walk#drive_using method. Pass in your Test driver code and allow the Walk to drive your System under test.
 
+
 ==== The code: ====
+
 
 First lets print out the coverage statistics for this walk:
 
@@ -134,7 +151,10 @@ google_walk_1.drive_using(SystemUnderTestDriver.new)
 
 You can download [http://sites.google.com/site/exploretesting/Home/errfix_google_eg_2.rb the code here].
 
+
 ====How to run the code:====
+
+
 Place the above file (and the CSV file mentioned above) in the same folder, open a UNIX Terminal or DOS prompt in the same  folder and type:
 {{{
 ruby errfix_google_eg_2.rb
@@ -163,6 +183,8 @@ testing: WEB
 
 
 ----
+
+
 ===Example 3: Guarded actions using the  errfix DSL (Foobar Media EFSM Example)===
 
 
@@ -245,4 +267,6 @@ MORE_CONTENT
 
 You can [http://sites.google.com/site/exploretesting/Home/errfix_dsl_example.rb?attredirects=0 download this code in full].
 
+
 ----
+

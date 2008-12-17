@@ -3,14 +3,14 @@
 *errfix* creates a software model of your system, from a simple CSV file or using its built in API. errfix lets you create _Random Walks_ across your model, moving from State to State by executing actions.
  
 
- # <A HREF=#example_1>Random_ Walk using a CSV defined model (Google Homepages Example)</A>
+ # <A HREF="#example_1" >Random_ Walk using a CSV defined model (Google Homepages Example)</A>
  # [#Example 2]
  # [#Example 3]
 
 
 ----
 
-<A NAME=#example_1>
+<A NAME=#example_1></A>
 === Example 1 : _Random_ Walk using a CSV defined model (Google Homepages Example)===
 
 

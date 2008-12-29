@@ -3,7 +3,7 @@
 *errfix* creates a software model of your system, from a simple CSV file or using its built in API. errfix lets you create _Random Walks_ across your model, moving from State to State by executing actions.
  
 
- <wiki:toc max_depth="4" />
+ <wiki:toc max_depth="5" />
 
 
 
@@ -251,10 +251,16 @@ smc.attach_transition(:HOME,:click_log_in,:LOG_IN_COMPLETE)
 smc.attach_transition(:LOG_IN_COMPLETE,:click_home,:HOME)
 
 my_efsm = smc..state_machine
-my_efsm.create_dot_graph.output("my_fsm_graph.dot")
+
 }}}
 
-Finally, above, we get a copy of the completed State Machine and then output the graph in DOT format.
+Finally, above, we get a copy of the completed State Machine.
+
+{{{
+my_efsm.create_dot_graph.output("my_fsm_graph.dot")
+}}}
+...and then output the graph in DOT format.
+
 
 What if I want to output a random walk across this model? 
 
